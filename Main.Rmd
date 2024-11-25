@@ -1,4 +1,4 @@
----
+﻿---
 title: "Proyecto Final - Efecto del Clima y Factores Ambientales en la Productividad Agrícola"
 author: "Est. Apl. 2"
 output: html_document
@@ -51,7 +51,7 @@ El conjunto de datos utilizado en este análisis proviene de Kaggle y está disp
 
 - **`Year`**  
   - **Tipo**: Numérica entera  
-  - **Descripción**: Año en que se registraron los datos, útil para análisis temporales y de tendencias.  
+  - **Descripción**: Año en que se registraron los datos, util para análisis temporales y de tendencias.  
 
 - **`Country`**  
   - **Tipo**: Categórica  
@@ -79,7 +79,7 @@ El conjunto de datos utilizado en este análisis proviene de Kaggle y está disp
 
 - **`Extreme_Weather_Events`**  
   - **Tipo**: Numérica entera  
-  - **Descripción**: Número de eventos climáticos extremos (e.g., sequías, inundaciones) durante la temporada.  
+  - **Descripción**: Numero de eventos climáticos extremos (e.g., sequías, inundaciones) durante la temporada.  
 
 - **`Irrigation_Access_%`**  
   - **Tipo**: Numérica continua  
@@ -95,7 +95,7 @@ El conjunto de datos utilizado en este análisis proviene de Kaggle y está disp
 
 - **`Soil_Health_Index`**  
   - **Tipo**: Numérica continua  
-  - **Descripción**: Índice que evalúa la calidad y salud del suelo, un factor importante en el rendimiento agrícola sostenible.  
+  - **Descripción**: Índice que evalua la calidad y salud del suelo, un factor importante en el rendimiento agrícola sostenible.  
 
 - **`Adaptation_Strategies`**  
   - **Tipo**: Categórica  
@@ -103,7 +103,7 @@ El conjunto de datos utilizado en este análisis proviene de Kaggle y está disp
 
 - **`Economic_Impact_Million_USD`**  
   - **Tipo**: Numérica continua  
-  - **Descripción**: Impacto económico estimado en millones de dólares, útil para evaluar las implicaciones económicas de los factores climáticos.  
+  - **Descripción**: Impacto económico estimado en millones de dólares, util para evaluar las implicaciones económicas de los factores climáticos.  
 
 Este dataset proporciona una base rica para explorar las relaciones entre los factores ambientales y climáticos, y la productividad agrícola a nivel global.
 
@@ -119,7 +119,7 @@ climate_data <- climate_data[, c("Crop_Yield_MT_per_HA", setdiff(names(climate_d
 
 
 
-### Variables Numéricas: Boxplots
+### Variables Numéricas: Boxplots e histogramas
 Los siguientes boxplots muestran la distribución de las variables numéricas en el dataset.
 
 Cargamos librerías
@@ -133,7 +133,7 @@ library(effectsize)
 ```
 
 
-Boxplot de `Crop_Yield_MT_per_HA`
+Boxplot e histograma de `Crop_Yield_MT_per_HA`
 ```{r boxplot-crop-yield}
 ggplot(climate_data, aes(y = Crop_Yield_MT_per_HA)) +
   geom_boxplot(outlier.color = "red", fill = "lightblue") +
@@ -142,9 +142,19 @@ ggplot(climate_data, aes(y = Crop_Yield_MT_per_HA)) +
     title = "Boxplot de Productividad Agrícola (`Crop_Yield_MT_per_HA`)",
     y = "Toneladas por Hectárea"
   )
+
+
+ggplot(climate_data, aes(x = Crop_Yield_MT_per_HA)) +
+  geom_histogram(binwidth = 0.5, fill = "lightblue", color = "black") +
+  theme_minimal() +
+  labs(
+    title = "Histograma de Productividad Agrícola (`Crop_Yield_MT_per_HA`)",
+    x = "Toneladas por Hectárea",
+    y = "Frecuencia"
+  )
 ```
 
-Boxplot de `Year`
+Boxplot e histograma de `Year`
 ```{r boxplot-year}
 ggplot(climate_data, aes(y = Year)) +
   geom_boxplot(outlier.color = "red", fill = "lightblue") +
@@ -153,20 +163,40 @@ ggplot(climate_data, aes(y = Year)) +
     title = "Boxplot de Año (`Year`)",
     y = "Año"
   )
+
+
+ggplot(climate_data, aes(x = Year)) +
+  geom_histogram(binwidth = 0.5, fill = "lightblue", color = "black") +
+  theme_minimal() +
+  labs(
+    title = "Histograma de Productividad Agrícola (`Year`)",
+    x = "Toneladas por Hectárea",
+    y = "Frecuencia"
+  )
 ```
 
-Boxplot de `Average_Temperature_C`
+Boxplot e histograma de `Average_Temperature_C`
 ```{r boxplot-temp}
 ggplot(climate_data, aes(y = Average_Temperature_C)) +
   geom_boxplot(outlier.color = "red", fill = "lightblue") +
   theme_minimal() +
   labs(
     title = "Boxplot de Temperatura Promedio (`Average_Temperature_C`)",
-    y = "Temperatura (°C)"
+    y = "Temperatura (Â°C)"
+  )
+
+
+ggplot(climate_data, aes(x = Average_Temperature_C)) +
+  geom_histogram(binwidth = 0.5, fill = "lightblue", color = "black") +
+  theme_minimal() +
+  labs(
+    title = "Histograma de Productividad Agrícola (`Average_Temperature_C`)",
+    x = "Toneladas por Hectárea",
+    y = "Frecuencia"
   )
 ```
 
-Boxplot de `Total_Precipitation_mm`
+Boxplot e historgama de `Total_Precipitation_mm`
 ```{r boxplot-precipitation}
 ggplot(climate_data, aes(y = Total_Precipitation_mm)) +
   geom_boxplot(outlier.color = "red", fill = "lightblue") +
@@ -175,9 +205,19 @@ ggplot(climate_data, aes(y = Total_Precipitation_mm)) +
     title = "Boxplot de Precipitación Total (`Total_Precipitation_mm`)",
     y = "Precipitación (mm)"
   )
+
+
+ggplot(climate_data, aes(x = Total_Precipitation_mm)) +
+  geom_histogram(binwidth = 0.5, fill = "lightblue", color = "black") +
+  theme_minimal() +
+  labs(
+    title = "Histograma de Productividad Agrícola (`Total_Precipitation_mm`)",
+    x = "Toneladas por Hectárea",
+    y = "Frecuencia"
+  )
 ```
 
-Boxplot de `CO2_Emissions_MT`
+Boxplot e histograma de `CO2_Emissions_MT`
 ```{r boxplot-co2}
 ggplot(climate_data, aes(y = CO2_Emissions_MT)) +
   geom_boxplot(outlier.color = "red", fill = "lightblue") +
@@ -186,9 +226,19 @@ ggplot(climate_data, aes(y = CO2_Emissions_MT)) +
     title = "Boxplot de Emisiones de CO2 (`CO2_Emissions_MT`)",
     y = "Emisiones (MT)"
   )
+
+
+ggplot(climate_data, aes(x = CO2_Emissions_MT)) +
+  geom_histogram(binwidth = 0.5, fill = "lightblue", color = "black") +
+  theme_minimal() +
+  labs(
+    title = "Histograma de Productividad Agrícola (`CO2_Emissions_MT`)",
+    x = "Toneladas por Hectárea",
+    y = "Frecuencia"
+  )
 ```
 
-Boxplot de `Extreme_Weather_Events`
+Boxplot e histograma de `Extreme_Weather_Events`
 ```{r boxplot-weather-events}
 ggplot(climate_data, aes(y = Extreme_Weather_Events)) +
   geom_boxplot(outlier.color = "red", fill = "lightblue") +
@@ -197,9 +247,19 @@ ggplot(climate_data, aes(y = Extreme_Weather_Events)) +
     title = "Boxplot de Eventos Climáticos Extremos (`Extreme_Weather_Events`)",
     y = "Cantidad de Eventos"
   )
+
+
+ggplot(climate_data, aes(x = Extreme_Weather_Events)) +
+  geom_histogram(binwidth = 0.5, fill = "lightblue", color = "black") +
+  theme_minimal() +
+  labs(
+    title = "Histograma de Productividad Agrícola (`Extreme_Weather_Events`)",
+    x = "Toneladas por Hectárea",
+    y = "Frecuencia"
+  )
 ```
 
-Boxplot de `Irrigation_Access_%`
+Boxplot e histograma de `Irrigation_Access_%`
 ```{r boxplot-irrigation}
 ggplot(climate_data, aes(y = Irrigation_Access_.)) +
   geom_boxplot(outlier.color = "red", fill = "lightblue") +
@@ -208,9 +268,19 @@ ggplot(climate_data, aes(y = Irrigation_Access_.)) +
     title = "Boxplot de Acceso a Riego (`Irrigation_Access_%`)",
     y = "Acceso (%)"
   )
+
+
+ggplot(climate_data, aes(x = Irrigation_Access_.)) +
+  geom_histogram(binwidth = 0.5, fill = "lightblue", color = "black") +
+  theme_minimal() +
+  labs(
+    title = "Histograma de Productividad Agrícola (`Irrigation_Access_.`)",
+    x = "Toneladas por Hectárea",
+    y = "Frecuencia"
+  )
 ```
 
-Boxplot de `Pesticide_Use_KG_per_HA`
+Boxplot e histograma de `Pesticide_Use_KG_per_HA`
 ```{r boxplot-pesticide}
 ggplot(climate_data, aes(y = Pesticide_Use_KG_per_HA)) +
   geom_boxplot(outlier.color = "red", fill = "lightblue") +
@@ -219,9 +289,19 @@ ggplot(climate_data, aes(y = Pesticide_Use_KG_per_HA)) +
     title = "Boxplot de Uso de Pesticidas (`Pesticide_Use_KG_per_HA`)",
     y = "Uso (KG/HA)"
   )
+
+
+ggplot(climate_data, aes(x = Pesticide_Use_KG_per_HA)) +
+  geom_histogram(binwidth = 0.5, fill = "lightblue", color = "black") +
+  theme_minimal() +
+  labs(
+    title = "Histograma de Productividad Agrícola (`Pesticide_Use_KG_per_HA`)",
+    x = "Toneladas por Hectárea",
+    y = "Frecuencia"
+  )
 ```
 
-Boxplot de `Fertilizer_Use_KG_per_HA`
+Boxplot e histograma de `Fertilizer_Use_KG_per_HA`
 ```{r boxplot-fertilizer}
 ggplot(climate_data, aes(y = Fertilizer_Use_KG_per_HA)) +
   geom_boxplot(outlier.color = "red", fill = "lightblue") +
@@ -230,9 +310,18 @@ ggplot(climate_data, aes(y = Fertilizer_Use_KG_per_HA)) +
     title = "Boxplot de Uso de Fertilizantes (`Fertilizer_Use_KG_per_HA`)",
     y = "Uso (KG/HA)"
   )
+
+ggplot(climate_data, aes(x = Fertilizer_Use_KG_per_HA)) +
+  geom_histogram(binwidth = 0.5, fill = "lightblue", color = "black") +
+  theme_minimal() +
+  labs(
+    title = "Histograma de Productividad Agrícola (`Fertilizer_Use_KG_per_HA`)",
+    x = "Toneladas por Hectárea",
+    y = "Frecuencia"
+  )
 ```
 
-Boxplot de `Soil_Health_Index`
+Boxplot e histograma de `Soil_Health_Index`
 ```{r boxplot-soil-health}
 ggplot(climate_data, aes(y = Soil_Health_Index)) +
   geom_boxplot(outlier.color = "red", fill = "lightblue") +
@@ -241,9 +330,18 @@ ggplot(climate_data, aes(y = Soil_Health_Index)) +
     title = "Boxplot del Índice de Salud del Suelo (`Soil_Health_Index`)",
     y = "Índice de Salud"
   )
+
+ggplot(climate_data, aes(x = Soil_Health_Index)) +
+  geom_histogram(binwidth = 0.5, fill = "lightblue", color = "black") +
+  theme_minimal() +
+  labs(
+    title = "Histograma de Productividad Agrícola (`Soil_Health_Index`)",
+    x = "Toneladas por Hectárea",
+    y = "Frecuencia"
+  )
 ```
 
-Boxplot de `Economic_Impact_Million_USD`
+Boxplot e histograma de `Economic_Impact_Million_USD`
 ```{r boxplot-economic-impact}
 ggplot(climate_data, aes(y = Economic_Impact_Million_USD)) +
   geom_boxplot(outlier.color = "red", fill = "lightblue") +
@@ -251,6 +349,15 @@ ggplot(climate_data, aes(y = Economic_Impact_Million_USD)) +
   labs(
     title = "Boxplot del Impacto Económico (`Economic_Impact_Million_USD`)",
     y = "Impacto (Millones USD)"
+  )
+
+ggplot(climate_data, aes(x = Economic_Impact_Million_USD)) +
+  geom_histogram(binwidth = 0.5, fill = "lightblue", color = "black") +
+  theme_minimal() +
+  labs(
+    title = "Histograma de Productividad Agrícola (`Economic_Impact_Million_USD`)",
+    x = "Toneladas por Hectárea",
+    y = "Frecuencia"
   )
 ```
 
