@@ -1,0 +1,491 @@
+---
+title: "Proyecto Final - Efecto del Clima y Factores Ambientales en la Productividad Agrícola"
+author: "Est. Apl. 2"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introducción al Problema
+
+La productividad agrícola es fundamental para la seguridad alimentaria y el desarrollo económico de muchas regiones del mundo. El cambio climático y las fluctuaciones ambientales han generado preocupaciones sobre cómo estos factores influyen en el rendimiento de los cultivos y, en consecuencia, en la sostenibilidad de la agricultura a nivel global. 
+
+Este análisis busca comprender el efecto que las condiciones climáticas y los factores ambientales tienen sobre la productividad agrícola. La relevancia de este problema radica en su impacto directo sobre la capacidad de los países para satisfacer las demandas alimenticias de su población, especialmente en un contexto de cambio climático y creciente presión sobre los recursos naturales.
+
+A partir de este contexto, se plantea responder a las siguientes preguntas de investigación mediante un análisis estadístico:  
+1. ¿Qué factores ambientales tienen un efecto significativo en la productividad agrícola? 
+2. ¿Qué modelo estadístico ofrece la mejor predicción de la productividad?
+
+El objetivo de este análisis es aportar información que pueda ser útil para diseñar políticas y estrategias agrícolas más resilientes y sostenibles en el futuro.
+
+
+
+
+
+
+
+<!-- ## Resumen del Análisis Estadístico -->
+
+
+<!-- ## Marco Teórico -->
+
+
+
+
+
+
+
+
+
+
+
+## Análisis de Datos
+
+El conjunto de datos utilizado en este análisis proviene de Kaggle y está disponible en el siguiente enlace: [Global Agriculture Climate Impact Dataset](https://www.kaggle.com/datasets/talhachoudary/global-agriculture-climate-impact-dataset?resource=download). Este dataset ofrece información detallada sobre la interacción entre factores climáticos, ambientales y agrícolas, y su impacto en la productividad de los cultivos. A continuación, se describen las variables incluidas en el dataset:
+
+- **`Crop_Yield_MT_per_HA`**  
+  - **Tipo**: Numérica continua  
+  - **Descripción**: Productividad agrícola medida en toneladas métricas por hectárea. Esta es la variable objetivo del análisis.  
+
+- **`Year`**  
+  - **Tipo**: Numérica entera  
+  - **Descripción**: Año en que se registraron los datos, útil para análisis temporales y de tendencias.  
+
+- **`Country`**  
+  - **Tipo**: Categórica  
+  - **Descripción**: País donde se recopiló la información, permite comparaciones entre regiones globales.  
+
+- **`Region`**  
+  - **Tipo**: Categórica  
+  - **Descripción**: Región específica dentro del país, utilizada para un análisis más granular.  
+
+- **`Crop_Type`**  
+  - **Tipo**: Categórica  
+  - **Descripción**: Tipo de cultivo analizado (e.g., trigo, maíz, arroz), relevante para estudiar el impacto de los factores en distintos cultivos.  
+
+- **`Average_Temperature_C`**  
+  - **Tipo**: Numérica continua  
+  - **Descripción**: Temperatura promedio registrada durante la temporada de cultivo, clave para evaluar el efecto del clima en el rendimiento agrícola.  
+
+- **`Total_Precipitation_mm`**  
+  - **Tipo**: Numérica continua  
+  - **Descripción**: Precipitación total (en milímetros) durante la temporada de cultivo, esencial para analizar la influencia de la lluvia en los cultivos.  
+
+- **`CO2_Emissions_MT`**  
+  - **Tipo**: Numérica continua  
+  - **Descripción**: Emisiones de CO2 (en toneladas métricas) relacionadas con actividades agrícolas o de la región.  
+
+- **`Extreme_Weather_Events`**  
+  - **Tipo**: Numérica entera  
+  - **Descripción**: Número de eventos climáticos extremos (e.g., sequías, inundaciones) durante la temporada.  
+
+- **`Irrigation_Access_%`**  
+  - **Tipo**: Numérica continua  
+  - **Descripción**: Porcentaje del área de cultivo que cuenta con acceso a sistemas de riego, indicador clave de infraestructura agrícola.  
+
+- **`Pesticide_Use_KG_per_HA`**  
+  - **Tipo**: Numérica continua  
+  - **Descripción**: Uso de pesticidas en kilogramos por hectárea, relacionado con el manejo de plagas y enfermedades en los cultivos.  
+
+- **`Fertilizer_Use_KG_per_HA`**  
+  - **Tipo**: Numérica continua  
+  - **Descripción**: Cantidad de fertilizantes utilizados por hectárea, esencial para estudiar la fertilidad del suelo y la productividad.  
+
+- **`Soil_Health_Index`**  
+  - **Tipo**: Numérica continua  
+  - **Descripción**: Índice que evalúa la calidad y salud del suelo, un factor importante en el rendimiento agrícola sostenible.  
+
+- **`Adaptation_Strategies`**  
+  - **Tipo**: Categórica  
+  - **Descripción**: Estrategias adoptadas para mitigar o adaptarse a los efectos del clima (e.g., rotación de cultivos, manejo de agua).  
+
+- **`Economic_Impact_Million_USD`**  
+  - **Tipo**: Numérica continua  
+  - **Descripción**: Impacto económico estimado en millones de dólares, útil para evaluar las implicaciones económicas de los factores climáticos.  
+
+Este dataset proporciona una base rica para explorar las relaciones entre los factores ambientales y climáticos, y la productividad agrícola a nivel global.
+
+
+Cargamos ahora los datos y pasamos **`Crop_Yield_MT_per_HA`** como la primer columna
+```{r}
+file_path <- "Data/climate_change_impact_on_agriculture_2024.csv"
+## Data obtained from https://www.kaggle.com/datasets/talhachoudary/global-agriculture-climate-impact-dataset
+climate_data <- read.csv(file_path)
+climate_data <- climate_data[, c("Crop_Yield_MT_per_HA", setdiff(names(climate_data), "Crop_Yield_MT_per_HA"))]
+```
+
+
+
+
+### Variables Numéricas: Boxplots
+Los siguientes boxplots muestran la distribución de las variables numéricas en el dataset.
+
+Cargamos librerías
+```{r, message=FALSE, warning=FALSE, results='hide'}
+if (!require("tidyverse")) install.packages("tidyverse")
+if (!require("effectsize")) install.packages("effectsize") # Para calcular eta squared
+if (!require("knitr")) install.packages("knitr")
+library(knitr)
+library(tidyverse)
+library(effectsize) 
+```
+
+
+Boxplot de `Crop_Yield_MT_per_HA`
+```{r boxplot-crop-yield}
+ggplot(climate_data, aes(y = Crop_Yield_MT_per_HA)) +
+  geom_boxplot(outlier.color = "red", fill = "lightblue") +
+  theme_minimal() +
+  labs(
+    title = "Boxplot de Productividad Agrícola (`Crop_Yield_MT_per_HA`)",
+    y = "Toneladas por Hectárea"
+  )
+```
+
+Boxplot de `Year`
+```{r boxplot-year}
+ggplot(climate_data, aes(y = Year)) +
+  geom_boxplot(outlier.color = "red", fill = "lightblue") +
+  theme_minimal() +
+  labs(
+    title = "Boxplot de Año (`Year`)",
+    y = "Año"
+  )
+```
+
+Boxplot de `Average_Temperature_C`
+```{r boxplot-temp}
+ggplot(climate_data, aes(y = Average_Temperature_C)) +
+  geom_boxplot(outlier.color = "red", fill = "lightblue") +
+  theme_minimal() +
+  labs(
+    title = "Boxplot de Temperatura Promedio (`Average_Temperature_C`)",
+    y = "Temperatura (°C)"
+  )
+```
+
+Boxplot de `Total_Precipitation_mm`
+```{r boxplot-precipitation}
+ggplot(climate_data, aes(y = Total_Precipitation_mm)) +
+  geom_boxplot(outlier.color = "red", fill = "lightblue") +
+  theme_minimal() +
+  labs(
+    title = "Boxplot de Precipitación Total (`Total_Precipitation_mm`)",
+    y = "Precipitación (mm)"
+  )
+```
+
+Boxplot de `CO2_Emissions_MT`
+```{r boxplot-co2}
+ggplot(climate_data, aes(y = CO2_Emissions_MT)) +
+  geom_boxplot(outlier.color = "red", fill = "lightblue") +
+  theme_minimal() +
+  labs(
+    title = "Boxplot de Emisiones de CO2 (`CO2_Emissions_MT`)",
+    y = "Emisiones (MT)"
+  )
+```
+
+Boxplot de `Extreme_Weather_Events`
+```{r boxplot-weather-events}
+ggplot(climate_data, aes(y = Extreme_Weather_Events)) +
+  geom_boxplot(outlier.color = "red", fill = "lightblue") +
+  theme_minimal() +
+  labs(
+    title = "Boxplot de Eventos Climáticos Extremos (`Extreme_Weather_Events`)",
+    y = "Cantidad de Eventos"
+  )
+```
+
+Boxplot de `Irrigation_Access_%`
+```{r boxplot-irrigation}
+ggplot(climate_data, aes(y = Irrigation_Access_.)) +
+  geom_boxplot(outlier.color = "red", fill = "lightblue") +
+  theme_minimal() +
+  labs(
+    title = "Boxplot de Acceso a Riego (`Irrigation_Access_%`)",
+    y = "Acceso (%)"
+  )
+```
+
+Boxplot de `Pesticide_Use_KG_per_HA`
+```{r boxplot-pesticide}
+ggplot(climate_data, aes(y = Pesticide_Use_KG_per_HA)) +
+  geom_boxplot(outlier.color = "red", fill = "lightblue") +
+  theme_minimal() +
+  labs(
+    title = "Boxplot de Uso de Pesticidas (`Pesticide_Use_KG_per_HA`)",
+    y = "Uso (KG/HA)"
+  )
+```
+
+Boxplot de `Fertilizer_Use_KG_per_HA`
+```{r boxplot-fertilizer}
+ggplot(climate_data, aes(y = Fertilizer_Use_KG_per_HA)) +
+  geom_boxplot(outlier.color = "red", fill = "lightblue") +
+  theme_minimal() +
+  labs(
+    title = "Boxplot de Uso de Fertilizantes (`Fertilizer_Use_KG_per_HA`)",
+    y = "Uso (KG/HA)"
+  )
+```
+
+Boxplot de `Soil_Health_Index`
+```{r boxplot-soil-health}
+ggplot(climate_data, aes(y = Soil_Health_Index)) +
+  geom_boxplot(outlier.color = "red", fill = "lightblue") +
+  theme_minimal() +
+  labs(
+    title = "Boxplot del Índice de Salud del Suelo (`Soil_Health_Index`)",
+    y = "Índice de Salud"
+  )
+```
+
+Boxplot de `Economic_Impact_Million_USD`
+```{r boxplot-economic-impact}
+ggplot(climate_data, aes(y = Economic_Impact_Million_USD)) +
+  geom_boxplot(outlier.color = "red", fill = "lightblue") +
+  theme_minimal() +
+  labs(
+    title = "Boxplot del Impacto Económico (`Economic_Impact_Million_USD`)",
+    y = "Impacto (Millones USD)"
+  )
+```
+
+
+
+### Variables Categóricas: Tablas de Frecuencia
+A continuación, se presentan las tablas de frecuencia para las variables categóricas del dataset.
+
+Frecuencia de Países **`Country`**
+```{r}
+country_freq <- as.data.frame(table(climate_data$Country))
+colnames(country_freq) <- c("Country", "Frequency")
+country_freq %>%
+  knitr::kable(
+    format = "markdown",
+    caption = "Frecuencia de los países (`Country`)"
+  )
+```
+
+Frecuencia de Regiones **`Region`**
+```{r}
+region_freq <- as.data.frame(table(climate_data$Region))
+colnames(region_freq) <- c("Region", "Frequency")
+region_freq %>%
+  knitr::kable(
+    format = "markdown",
+    caption = "Frecuencia de las regiones (`Region`)"
+  )
+```
+
+Frecuencia de Tipos de Cultivo **`Crop_Type`**
+```{r}
+crop_type_freq <- as.data.frame(table(climate_data$Crop_Type))
+colnames(crop_type_freq) <- c("Crop Type", "Frequency")
+crop_type_freq %>%
+  knitr::kable(
+    format = "markdown",
+    caption = "Frecuencia de los tipos de cultivo (`Crop_Type`)"
+  )
+```
+
+Frecuencia de Estrategias de Adaptación **`Adaptation_Strategies`**
+```{r}
+adaptation_freq <- as.data.frame(table(climate_data$Adaptation_Strategies))
+colnames(adaptation_freq) <- c("Adaptation Strategy", "Frequency")
+adaptation_freq %>%
+  knitr::kable(
+    format = "markdown",
+    caption = "Frecuencia de las estrategias de adaptación (`Adaptation_Strategies`)"
+  )
+```
+
+
+### Pairwise scatter plots
+Obtengamos la información numérica 
+```{r}
+numeric_vars <- climate_data[, sapply(climate_data, is.numeric)]
+```
+
+Hagamos el plot
+```{r}
+pairs(numeric_vars)
+```
+
+### Coeficientes empíricos de Pearson
+Veamos qué tan correlacionadas están nuestras variables utilizando el coeficiente empírico de Pearson
+```{r}
+cor(numeric_vars)
+```
+
+
+### Cálculo de Eta Squared para Variables Numéricas y Categóricas
+
+A continuación, se calculan los valores de \(\eta^2\) para cada combinación posible de una variable numérica continua y una variable categórica del dataset.
+
+```{r, warning=FALSE, results='hide', message=FALSE}
+
+# Separar variables numéricas y categóricas
+numeric_vars <- climate_data[, sapply(climate_data, is.numeric)]
+categorical_vars <- climate_data[, sapply(climate_data, is.character)]
+
+# Función para calcular eta squared
+calculate_eta_squared <- function(numeric_col, categorical_col) {
+  # Crear un data frame temporal para trabajar
+  temp_data <- data.frame(
+    numeric_col = numeric_col,
+    categorical_col = categorical_col
+  )
+  # Remover NA para evitar errores
+  temp_data <- na.omit(temp_data)
+  
+  # Calcular eta squared
+  model <- aov(numeric_col ~ categorical_col, data = temp_data)
+  eta_squared <- eta_squared(model)
+  return(eta_squared$Eta2[1]) # Devuelve el eta squared para el efecto principal
+}
+
+# Crear un data frame para almacenar los resultados
+results <- expand.grid(
+  Numeric = colnames(numeric_vars),
+  Categorical = colnames(categorical_vars)
+) %>%
+  rowwise() %>%
+  mutate(Eta_Squared = calculate_eta_squared(
+    numeric_vars[[Numeric]],
+    categorical_vars[[Categorical]]
+  )) %>%
+  ungroup()
+
+# Mostrar resultados en una tabla ordenada
+results <- results %>% arrange(desc(Eta_Squared))
+```
+
+
+Los resultados ordenados por eta-squared se presentan a continuación.
+
+```{r eta-squared-results}
+# Mostrar resultados en una tabla
+kable(
+  results,
+  caption = "Resultados de Eta Squared para cada par de variables numéricas y categóricas"
+)
+```
+
+
+
+### Cálculo de Cramér's V para Variables Categóricas
+
+A continuación, se calcula el valor de Cramér's V (\(V\)) para cada combinación posible de dos variables categóricas del dataset.
+
+```{r cramers-v-calculation, warning=FALSE, message=FALSE}
+# Instalar y cargar paquetes necesarios
+if (!require("vcd")) install.packages("vcd") # Para calcular Cramér's V
+if (!require("tidyverse")) install.packages("tidyverse") # Para manejo de datos
+library(vcd)
+library(tidyverse)
+
+# Seleccionar solo variables categóricas
+categorical_vars <- climate_data[, sapply(climate_data, is.character)]
+
+# Función para calcular Cramér's V
+calculate_cramers_v <- function(var1, var2) {
+  # Crear tabla de contingencia
+  contingency_table <- table(var1, var2)
+  # Calcular Cramér's V
+  cramers_v <- assocstats(contingency_table)$cramer
+  return(cramers_v)
+}
+
+# Generar combinaciones de todas las variables categóricas
+categorical_combinations <- combn(colnames(categorical_vars), 2, simplify = FALSE)
+
+# Calcular Cramér's V para cada combinación
+results_cramers_v <- map_dfr(
+  categorical_combinations,
+  ~ tibble(
+    Var1 = .x[1],
+    Var2 = .x[2],
+    Cramers_V = calculate_cramers_v(categorical_vars[[.x[1]]], categorical_vars[[.x[2]]])
+  )
+)
+
+# Ordenar resultados por el valor de Cramér's V
+results_cramers_v <- results_cramers_v %>% arrange(desc(Cramers_V))
+```
+
+
+Los resultados de Cramér's V para cada combinación de variables categóricas se presentan a continuación.
+
+```{r cramers-v-results}
+# Mostrar resultados en una tabla
+if (!require("knitr")) install.packages("knitr")
+library(knitr)
+
+kable(
+  results_cramers_v,
+  caption = "Resultados de Cramér's V para cada par de variables categóricas"
+)
+```
+
+
+### Efectos categóricos
+
+Veamos si, para cada una de nuestras variables categóricas, las diferentes categorías tienen efecto sobre la media de **`Crop_Yield_MT_per_HA`**
+
+Test del efecto de **`Country`**
+```{r}
+summary(aov(Crop_Yield_MT_per_HA ~ Country, climate_data))
+```
+
+Test del efecto de **`Region`**
+```{r}
+summary(aov(Crop_Yield_MT_per_HA ~ Region, climate_data))
+```
+
+Test del efecto de **`Crop_Type`**
+```{r}
+summary(aov(Crop_Yield_MT_per_HA ~ Crop_Type, climate_data))
+```
+
+Test del efecto de **`Adaptation_Strategies`**
+```{r}
+summary(aov(Crop_Yield_MT_per_HA ~ Adaptation_Strategies, climate_data))
+```
+
+
+
+### Modelo inicial
+
+Haremos un modelo con toda la información posible cambiando interceptos por cada variable categórica
+```{r}
+fit <- lm(Crop_Yield_MT_per_HA ~ ., data=climate_data)
+summary(fit)
+```
+
+
+### Modelo reducido
+```{r}
+fitReduced <- lm(Crop_Yield_MT_per_HA ~ Average_Temperature_C + Total_Precipitation_mm + CO2_Emissions_MT + Economic_Impact_Million_USD, climate_data)
+summary(fitReduced)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- ## Interpretación de Resultados -->
+
+
+<!-- ## Conclusiones -->
+
