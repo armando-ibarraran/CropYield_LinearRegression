@@ -1,4 +1,4 @@
-﻿---
+---
 title: "Proyecto Final - Efecto del Clima y Factores Ambientales en la Productividad Agrícola"
 author: "Est. Apl. 2"
 output: html_document
@@ -366,48 +366,92 @@ ggplot(climate_data, aes(x = Economic_Impact_Million_USD)) +
 ### Variables Categóricas: Tablas de Frecuencia
 A continuación, se presentan las tablas de frecuencia para las variables categóricas del dataset.
 
-Frecuencia de Países **`Country`**
+Frecuencia  de Países **`Country`**
 ```{r}
-country_freq <- as.data.frame(table(climate_data$Country))
-colnames(country_freq) <- c("Country", "Frequency")
-country_freq %>%
-  knitr::kable(
-    format = "markdown",
-    caption = "Frecuencia de los países (`Country`)"
-  )
+# Crear la tabla de frecuencias y calcular el porcentaje
+var_freq <- as.data.frame(table(climate_data$Country))
+colnames(var_freq) <- c("Country", "Frequency")
+var_freq <- var_freq %>%
+  mutate(Percentage = (Frequency / sum(Frequency)) * 100)
+
+# Crear la gráfica combinada de frecuencia y porcentaje
+ggplot(var_freq, aes(x = reorder(Country, -Frequency), y = Frequency)) +
+  geom_bar(stat = "identity", fill = "lightblue") +
+  geom_text(aes(label = paste0(round(Percentage, 1), "%")), 
+            vjust = -0.5, size = 3.5, color = "black") +
+  theme_minimal() +
+  labs(
+    title = "Frecuencia y Porcentaje de Países",
+    x = "País",
+    y = "Frecuencia"
+  ) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
 Frecuencia de Regiones **`Region`**
 ```{r}
-region_freq <- as.data.frame(table(climate_data$Region))
-colnames(region_freq) <- c("Region", "Frequency")
-region_freq %>%
-  knitr::kable(
-    format = "markdown",
-    caption = "Frecuencia de las regiones (`Region`)"
-  )
+# Crear la tabla de frecuencias y calcular el porcentaje
+var_freq <- as.data.frame(table(climate_data$Region))
+colnames(var_freq) <- c("Region", "Frequency")
+var_freq <- var_freq %>%
+  mutate(Percentage = (Frequency / sum(Frequency)) * 100)
+
+# Crear la gráfica combinada de frecuencia y porcentaje
+ggplot(var_freq, aes(x = reorder(Region, -Frequency), y = Frequency)) +
+  geom_bar(stat = "identity", fill = "lightblue") +
+  geom_text(aes(label = paste0(round(Percentage, 1), "%")), 
+            vjust = -0.5, size = 3.5, color = "black") +
+  theme_minimal() +
+  labs(
+    title = "Frecuencia y Porcentaje de Regiones",
+    x = "Región",
+    y = "Frecuencia"
+  ) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
 Frecuencia de Tipos de Cultivo **`Crop_Type`**
 ```{r}
-crop_type_freq <- as.data.frame(table(climate_data$Crop_Type))
-colnames(crop_type_freq) <- c("Crop Type", "Frequency")
-crop_type_freq %>%
-  knitr::kable(
-    format = "markdown",
-    caption = "Frecuencia de los tipos de cultivo (`Crop_Type`)"
-  )
+# Crear la tabla de frecuencias y calcular el porcentaje
+var_freq <- as.data.frame(table(climate_data$Crop_Type))
+colnames(var_freq) <- c("Crop_Type", "Frequency")
+var_freq <- var_freq %>%
+  mutate(Percentage = (Frequency / sum(Frequency)) * 100)
+
+# Crear la gráfica combinada de frecuencia y porcentaje
+ggplot(var_freq, aes(x = reorder(Crop_Type, -Frequency), y = Frequency)) +
+  geom_bar(stat = "identity", fill = "lightblue") +
+  geom_text(aes(label = paste0(round(Percentage, 1), "%")), 
+            vjust = -0.5, size = 3.5, color = "black") +
+  theme_minimal() +
+  labs(
+    title = "Frecuencia y Porcentaje de Tipos de Cultivo",
+    x = "Tipo",
+    y = "Frecuencia"
+  ) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
 Frecuencia de Estrategias de Adaptación **`Adaptation_Strategies`**
 ```{r}
-adaptation_freq <- as.data.frame(table(climate_data$Adaptation_Strategies))
-colnames(adaptation_freq) <- c("Adaptation Strategy", "Frequency")
-adaptation_freq %>%
-  knitr::kable(
-    format = "markdown",
-    caption = "Frecuencia de las estrategias de adaptación (`Adaptation_Strategies`)"
-  )
+# Crear la tabla de frecuencias y calcular el porcentaje
+var_freq <- as.data.frame(table(climate_data$Adaptation_Strategies))
+colnames(var_freq) <- c("Adaptation_Strategies", "Frequency")
+var_freq <- var_freq %>%
+  mutate(Percentage = (Frequency / sum(Frequency)) * 100)
+
+# Crear la gráfica combinada de frecuencia y porcentaje
+ggplot(var_freq, aes(x = reorder(Adaptation_Strategies, -Frequency), y = Frequency)) +
+  geom_bar(stat = "identity", fill = "lightblue") +
+  geom_text(aes(label = paste0(round(Percentage, 1), "%")), 
+            vjust = -0.5, size = 3.5, color = "black") +
+  theme_minimal() +
+  labs(
+    title = "Frecuencia y Porcentaje de Estrategias de Adaptación",
+    x = "Estrategia",
+    y = "Frecuencia"
+  ) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
 
