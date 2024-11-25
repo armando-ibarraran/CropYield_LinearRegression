@@ -169,8 +169,8 @@ ggplot(climate_data, aes(x = Year)) +
   geom_histogram(binwidth = 0.5, fill = "lightblue", color = "black") +
   theme_minimal() +
   labs(
-    title = "Histograma de Productividad Agrícola (`Year`)",
-    x = "Toneladas por Hectárea",
+    title = "Histograma de Año (`Year`)",
+    x = "Año",
     y = "Frecuencia"
   )
 ```
@@ -190,8 +190,8 @@ ggplot(climate_data, aes(x = Average_Temperature_C)) +
   geom_histogram(binwidth = 0.5, fill = "lightblue", color = "black") +
   theme_minimal() +
   labs(
-    title = "Histograma de Productividad Agrícola (`Average_Temperature_C`)",
-    x = "Toneladas por Hectárea",
+    title = "Histograma de Temperatura Promedio (`Average_Temperature_C`)",
+    x = "Grados centigrados",
     y = "Frecuencia"
   )
 ```
@@ -211,8 +211,8 @@ ggplot(climate_data, aes(x = Total_Precipitation_mm)) +
   geom_histogram(binwidth = 0.5, fill = "lightblue", color = "black") +
   theme_minimal() +
   labs(
-    title = "Histograma de Productividad Agrícola (`Total_Precipitation_mm`)",
-    x = "Toneladas por Hectárea",
+    title = "Histograma de Precipitación Total (`Total_Precipitation_mm`)",
+    x = "Milimetros",
     y = "Frecuencia"
   )
 ```
@@ -232,8 +232,8 @@ ggplot(climate_data, aes(x = CO2_Emissions_MT)) +
   geom_histogram(binwidth = 0.5, fill = "lightblue", color = "black") +
   theme_minimal() +
   labs(
-    title = "Histograma de Productividad Agrícola (`CO2_Emissions_MT`)",
-    x = "Toneladas por Hectárea",
+    title = "Histograma de Emisiones de CO2 (`CO2_Emissions_MT`)",
+    x = "Toneladas métricas",
     y = "Frecuencia"
   )
 ```
@@ -253,8 +253,8 @@ ggplot(climate_data, aes(x = Extreme_Weather_Events)) +
   geom_histogram(binwidth = 0.5, fill = "lightblue", color = "black") +
   theme_minimal() +
   labs(
-    title = "Histograma de Productividad Agrícola (`Extreme_Weather_Events`)",
-    x = "Toneladas por Hectárea",
+    title = "Histograma de Eventos Climáticos Extremos (`Extreme_Weather_Events`)",
+    x = "Numero de eventos",
     y = "Frecuencia"
   )
 ```
@@ -274,8 +274,8 @@ ggplot(climate_data, aes(x = Irrigation_Access_.)) +
   geom_histogram(binwidth = 0.5, fill = "lightblue", color = "black") +
   theme_minimal() +
   labs(
-    title = "Histograma de Productividad Agrícola (`Irrigation_Access_.`)",
-    x = "Toneladas por Hectárea",
+    title = "Histograma de Acceso a Riego (`Irrigation_Access_.`)",
+    x = "Indx",
     y = "Frecuencia"
   )
 ```
@@ -295,8 +295,8 @@ ggplot(climate_data, aes(x = Pesticide_Use_KG_per_HA)) +
   geom_histogram(binwidth = 0.5, fill = "lightblue", color = "black") +
   theme_minimal() +
   labs(
-    title = "Histograma de Productividad Agrícola (`Pesticide_Use_KG_per_HA`)",
-    x = "Toneladas por Hectárea",
+    title = "Histograma de Uso de Pesticidas (`Pesticide_Use_KG_per_HA`)",
+    x = "KG per HA",
     y = "Frecuencia"
   )
 ```
@@ -315,8 +315,8 @@ ggplot(climate_data, aes(x = Fertilizer_Use_KG_per_HA)) +
   geom_histogram(binwidth = 0.5, fill = "lightblue", color = "black") +
   theme_minimal() +
   labs(
-    title = "Histograma de Productividad Agrícola (`Fertilizer_Use_KG_per_HA`)",
-    x = "Toneladas por Hectárea",
+    title = "Histograma de Uso de Fertilizantes (`Fertilizer_Use_KG_per_HA`)",
+    x = "KG per HA",
     y = "Frecuencia"
   )
 ```
@@ -335,8 +335,8 @@ ggplot(climate_data, aes(x = Soil_Health_Index)) +
   geom_histogram(binwidth = 0.5, fill = "lightblue", color = "black") +
   theme_minimal() +
   labs(
-    title = "Histograma de Productividad Agrícola (`Soil_Health_Index`)",
-    x = "Toneladas por Hectárea",
+    title = "Histograma de Índice de Salud del Suelo (`Soil_Health_Index`)",
+    x = "Indx",
     y = "Frecuencia"
   )
 ```
@@ -355,8 +355,8 @@ ggplot(climate_data, aes(x = Economic_Impact_Million_USD)) +
   geom_histogram(binwidth = 0.5, fill = "lightblue", color = "black") +
   theme_minimal() +
   labs(
-    title = "Histograma de Productividad Agrícola (`Economic_Impact_Million_USD`)",
-    x = "Toneladas por Hectárea",
+    title = "Histograma del Impacto Económico (`Economic_Impact_Million_USD`)",
+    x = "Million USD",
     y = "Frecuencia"
   )
 ```
