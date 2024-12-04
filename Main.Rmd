@@ -745,10 +745,9 @@ La bondad de ajuste también implica verificar que el modelo cumple con los supu
 En el caso de un modelo lineal generalizado (GLM) con distribución gamma y enlace logarítmico, es importante asegurarse de que:
 
 \begin{enumerate}
-    \item \textbf{La distribución de los residuos} sigue el supuesto de la familia gamma.
+    \item \textbf{La dispersión residual} es razonable y consistente con los supuestos.
     \item \textbf{El enlace logarítmico} es adecuado para relacionar las variables predictoras con la variable objetivo.
     \item \textbf{No existen valores atípicos extremos} que influyan de manera desproporcionada en el modelo.
-    \item \textbf{La dispersión residual} es razonable y consistente con los supuestos.
 \end{enumerate}
 
 A continuación, verificaremos estos aspectos mediante visualizaciones y métricas clave para asegurar que el modelo respeta sus supuestos fundamentales. 
@@ -765,18 +764,18 @@ Esto es crucial para garantizar la validez de las inferencias y predicciones der
 
 
 ```{r, echo=TRUE, results='hide', fig.show="hide"}
-# Función para crear gráficos de residuos vs valores predichos
-create_residual_vs_predicted <- function(model, model_name) {
+# Función para crear gráficos de residuos vs predictor lineal
+create_residual_vs_linear_predictor <- function(model, model_name) {
   # Residuos de Pearson
   pearson_residuals <- residuals(model, type = "pearson")
-  pred_values <- predict(model, type = "response")
+  linear_predictor <- predict(model, type = "link")  # Predictor lineal
   
   scatter_pearson <- ggplot() +
-    aes(x = pred_values, y = pearson_residuals) +
+    aes(x = linear_predictor, y = pearson_residuals) +
     geom_point(alpha = 0.5) +
     geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
     labs(title = paste("Residuos de Pearson -", model_name), 
-         x = "Valores Predichos", 
+         x = "Predictor Lineal (\u03B7)", 
          y = "Residuos de Pearson") +
     theme_minimal()
   
@@ -784,11 +783,10 @@ create_residual_vs_predicted <- function(model, model_name) {
   deviance_residuals <- residuals(model, type = "deviance")
   
   scatter_deviance <- ggplot() +
-    aes(x = pred_values, y = deviance_residuals) +
+    aes(x = linear_predictor, y = deviance_residuals) +
     geom_point(alpha = 0.5) +
-    geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
     labs(title = paste("Residuos de Deviance -", model_name), 
-         x = "Valores Predichos", 
+         x = "Predictor Lineal (\u03B7)", 
          y = "Residuos de Deviance") +
     theme_minimal()
   
@@ -796,10 +794,10 @@ create_residual_vs_predicted <- function(model, model_name) {
 }
 
 # Crear las gráficas para cada modelo
-plots_log <- create_residual_vs_predicted(glm_log, "Log")
-plots_inverse <- create_residual_vs_predicted(glm_inverse, "Inverse")
-plots_log_red <- create_residual_vs_predicted(glm_log.red, "Log Reducido")
-plots_inverse_red <- create_residual_vs_predicted(glm_inverse.red, "Inverse Reducido")
+plots_log <- create_residual_vs_linear_predictor(glm_log, "Log")
+plots_inverse <- create_residual_vs_linear_predictor(glm_inverse, "Inverse")
+plots_log_red <- create_residual_vs_linear_predictor(glm_log.red, "Log Reducido")
+plots_inverse_red <- create_residual_vs_linear_predictor(glm_inverse.red, "Inverse Reducido")
 
 # Combinar todas las gráficas en una sola lista
 all_plots <- c(
@@ -821,7 +819,7 @@ ggsave(
     widths = unit(c(1, 1), "null")          # Ajustar proporciones para columnas
   ),
   width = 12,  # Ancho total en pulgadas
-  height = 16  # Alto total en pulgadas,
+  height = 16  # Alto total en pulgadas
 )
 ```
 ![Comparación de Residuos](residual_plots_grid.png)
