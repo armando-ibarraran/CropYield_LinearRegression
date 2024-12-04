@@ -564,7 +564,7 @@ Este análisis es particularmente valioso para:
 - Explorar la fuerza de asociación entre grupos definidos por una categoría y una medida cuantitativa.
 - Identificar variables categóricas relevantes para el análisis predictivo o explicativo.
 
-```{r, warning=FALSE, results='hide', message=FALSE}
+```{r, warning=FALSE, message=FALSE}
 
 # Separar variables numéricas y categóricas
 numeric_vars <- climate_data[, sapply(climate_data, is.numeric)]
