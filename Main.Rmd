@@ -1,14 +1,17 @@
 ---
-title: "Proyecto Final - Efecto del Clima y Factores Ambientales en la Productividad Agrícola"
+title: "Proyecto Final - Efecto del Clima y Factores Ambientales en la Productividad
+  Agrícola"
 author: "Est. Apl. 2"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Introducción al Problema
+# Introducción al Problema
 
 La productividad agrícola es fundamental para la seguridad alimentaria y el desarrollo económico de muchas regiones del mundo. El cambio climático y las fluctuaciones ambientales han generado preocupaciones sobre cómo estos factores influyen en el rendimiento de los cultivos y, en consecuencia, en la sostenibilidad de la agricultura a nivel global. 
 
@@ -26,13 +29,10 @@ El objetivo de este análisis es aportar información que pueda ser útil para d
 
 
 
-<!-- ## Resumen del Análisis Estadístico -->
+<!-- # Resumen del Análisis Estadístico -->
 
 
-<!-- ## Marco Teórico -->
-
-
-
+<!-- # Marco Teórico -->
 
 
 
@@ -41,7 +41,10 @@ El objetivo de este análisis es aportar información que pueda ser útil para d
 
 
 
-## Análisis de Datos
+
+
+
+# Análisis de Datos
 
 El conjunto de datos utilizado en este análisis proviene de Kaggle y está disponible en el siguiente enlace: [Global Agriculture Climate Impact Dataset](https://www.kaggle.com/datasets/talhachoudary/global-agriculture-climate-impact-dataset?resource=download). Este dataset ofrece información detallada sobre la interacción entre factores climáticos, ambientales y agrícolas, y su impacto en la productividad de los cultivos. A continuación, se describen las variables incluidas en el dataset:
 
@@ -51,11 +54,11 @@ El conjunto de datos utilizado en este análisis proviene de Kaggle y está disp
 
 - **`Year`**  
   - **Tipo**: Numérica entera  
-  - **Descripción**: Año en que se registraron los datos, util para análisis temporales y de tendencias.  
+  - **Descripción**: Año en que se registraron los datos.  
 
 - **`Country`**  
   - **Tipo**: Categórica  
-  - **Descripción**: País donde se recopiló la información, permite comparaciones entre regiones globales.  
+  - **Descripción**: País donde se recopiló la información.
 
 - **`Region`**  
   - **Tipo**: Categórica  
@@ -63,15 +66,15 @@ El conjunto de datos utilizado en este análisis proviene de Kaggle y está disp
 
 - **`Crop_Type`**  
   - **Tipo**: Categórica  
-  - **Descripción**: Tipo de cultivo analizado (e.g., trigo, maíz, arroz), relevante para estudiar el impacto de los factores en distintos cultivos.  
+  - **Descripción**: Tipo de cultivo analizado (e.g., trigo, maíz, arroz).
 
 - **`Average_Temperature_C`**  
   - **Tipo**: Numérica continua  
-  - **Descripción**: Temperatura promedio registrada durante la temporada de cultivo, clave para evaluar el efecto del clima en el rendimiento agrícola.  
+  - **Descripción**: Temperatura promedio registrada durante la temporada de cultivo.
 
 - **`Total_Precipitation_mm`**  
   - **Tipo**: Numérica continua  
-  - **Descripción**: Precipitación total (en milímetros) durante la temporada de cultivo, esencial para analizar la influencia de la lluvia en los cultivos.  
+  - **Descripción**: Precipitación total (en milímetros) durante la temporada de cultivo.
 
 - **`CO2_Emissions_MT`**  
   - **Tipo**: Numérica continua  
@@ -83,19 +86,19 @@ El conjunto de datos utilizado en este análisis proviene de Kaggle y está disp
 
 - **`Irrigation_Access_%`**  
   - **Tipo**: Numérica continua  
-  - **Descripción**: Porcentaje del área de cultivo que cuenta con acceso a sistemas de riego, indicador clave de infraestructura agrícola.  
+  - **Descripción**: Porcentaje del área de cultivo que cuenta con acceso a sistemas de riego.
 
 - **`Pesticide_Use_KG_per_HA`**  
   - **Tipo**: Numérica continua  
-  - **Descripción**: Uso de pesticidas en kilogramos por hectárea, relacionado con el manejo de plagas y enfermedades en los cultivos.  
+  - **Descripción**: Uso de pesticidas en kilogramos por hectárea.
 
 - **`Fertilizer_Use_KG_per_HA`**  
   - **Tipo**: Numérica continua  
-  - **Descripción**: Cantidad de fertilizantes utilizados por hectárea, esencial para estudiar la fertilidad del suelo y la productividad.  
+  - **Descripción**: Cantidad de fertilizantes utilizados por hectárea.
 
 - **`Soil_Health_Index`**  
   - **Tipo**: Numérica continua  
-  - **Descripción**: Índice que evalua la calidad y salud del suelo, un factor importante en el rendimiento agrícola sostenible.  
+  - **Descripción**: Índice que evalua la calidad y salud del suelo.
 
 - **`Adaptation_Strategies`**  
   - **Tipo**: Categórica  
@@ -103,270 +106,310 @@ El conjunto de datos utilizado en este análisis proviene de Kaggle y está disp
 
 - **`Economic_Impact_Million_USD`**  
   - **Tipo**: Numérica continua  
-  - **Descripción**: Impacto económico estimado en millones de dólares, util para evaluar las implicaciones económicas de los factores climáticos.  
+  - **Descripción**: Impacto económico de la venta de los cultivos (estimado en millones de dólares).
 
 Este dataset proporciona una base rica para explorar las relaciones entre los factores ambientales y climáticos, y la productividad agrícola a nivel global.
-
-
-Cargamos ahora los datos y pasamos **`Crop_Yield_MT_per_HA`** como la primer columna
-```{r}
-file_path <- "Data/climate_change_impact_on_agriculture_2024.csv"
-## Data obtained from https://www.kaggle.com/datasets/talhachoudary/global-agriculture-climate-impact-dataset
-climate_data <- read.csv(file_path)
-climate_data <- climate_data[, c("Crop_Yield_MT_per_HA", setdiff(names(climate_data), "Crop_Yield_MT_per_HA"))]
-```
-
-
-
-
-### Variables Numéricas: Boxplots e histogramas
-Los siguientes boxplots muestran la distribución de las variables numéricas en el dataset.
 
 Cargamos librerías
 ```{r, message=FALSE, warning=FALSE, results='hide'}
 if (!require("tidyverse")) install.packages("tidyverse")
 if (!require("effectsize")) install.packages("effectsize") # Para calcular eta squared
-if (!require("knitr")) install.packages("knitr")
+if (!require("knitr")) install.packages("knitr")# Instalar y cargar paquetes necesarios
+if (!require("vcd")) install.packages("vcd") # Para calcular Cramér's V
+if (!require("countrycode")) install.packages("countrycode") # Para agrupar países en continentes
+if (!require("naniar")) install.packages("naniar") # Para visualizar datos faltantes
+if (!require("patchwork")) install.packages("patchwork")
+if (!require("gridExtra")) install.packages("gridExtra")
+if (!require("reshape2")) install.packages("reshape2")
+library(reshape2)
+library(gridExtra)
+library(patchwork)
+library(naniar)
+library(countrycode)
+library(vcd)
 library(knitr)
 library(tidyverse)
 library(effectsize) 
 ```
 
 
+Cargamos ahora los datos y pasamos **`Crop_Yield_MT_per_HA`** como la primer columna
+```{r}
+file_path <- "Data/climate_change_impact_on_agriculture_2024.csv"
+# Data obtained from https://www.kaggle.com/datasets/talhachoudary/global-agriculture-climate-impact-dataset
+climate_data <- read.csv(file_path)
+climate_data <- climate_data[, c("Crop_Yield_MT_per_HA", setdiff(names(climate_data), "Crop_Yield_MT_per_HA"))]
+```
+
+
+## Datos faltantes
+```{r}
+# Resumen de datos faltantes por columna
+missing_summary <- climate_data %>%
+  summarise(across(everything(), ~ sum(is.na(.)))) %>%
+  pivot_longer(cols = everything(), names_to = "Variable", values_to = "Missing_Count") %>%
+  mutate(Missing_Percentage = (Missing_Count / nrow(climate_data)) * 100)
+
+# Mostrar resumen
+missing_summary %>%
+  arrange(desc(Missing_Percentage)) %>%
+  knitr::kable(format = "markdown", caption = "Datos Faltantes por Variable")
+
+```
+
+Como no hay datos faltantes, continuamos.
+
+
+## Variables Numéricas: Boxplots e histogramas
+Los siguientes boxplots e histogramas muestran la distribución de las variables numéricas en el dataset.
+
+
+
+
 Boxplot e histograma de `Crop_Yield_MT_per_HA`
 ```{r boxplot-crop-yield}
-ggplot(climate_data, aes(y = Crop_Yield_MT_per_HA)) +
-  geom_boxplot(outlier.color = "red", fill = "lightblue") +
-  theme_minimal() +
-  labs(
-    title = "Boxplot de Productividad Agrícola (`Crop_Yield_MT_per_HA`)",
-    y = "Toneladas por Hectárea"
-  )
+x <- climate_data$Crop_Yield_MT_per_HA
 
+hist(x, prob = TRUE, 
+     col = "lightblue", 
+     main = "Histograma y Boxplot de Productividad Agrícola", 
+     xlab = "Rendimiento de Cultivo (MT/HA)", 
+     ylab = "Densidad")
 
-ggplot(climate_data, aes(x = Crop_Yield_MT_per_HA)) +
-  geom_histogram(binwidth = 0.5, fill = "lightblue", color = "black") +
-  theme_minimal() +
-  labs(
-    title = "Histograma de Productividad Agrícola (`Crop_Yield_MT_per_HA`)",
-    x = "Toneladas por Hectárea",
-    y = "Frecuencia"
-  )
+par(new = TRUE)
+
+boxplot(x, horizontal = TRUE, axes = FALSE, 
+        col = rgb(0, 1, 0, alpha = 0.5), 
+        at = 0.25, 
+        height = 0.005, 
+        whisklty = 1, whisklwd = 2, staplewex = 0.5, staplelwd = 2)
+
+box()
 ```
 
 Boxplot e histograma de `Year`
 ```{r boxplot-year}
-ggplot(climate_data, aes(y = Year)) +
-  geom_boxplot(outlier.color = "red", fill = "lightblue") +
-  theme_minimal() +
-  labs(
-    title = "Boxplot de Año (`Year`)",
-    y = "Año"
-  )
+x <- climate_data$Year
 
+hist(x, prob = TRUE, 
+     col = "lightblue", 
+     main = "Histograma y Boxplot del Año", 
+     xlab = "Año", 
+     ylab = "Densidad")
 
-ggplot(climate_data, aes(x = Year)) +
-  geom_histogram(binwidth = 0.5, fill = "lightblue", color = "black") +
-  theme_minimal() +
-  labs(
-    title = "Histograma de Año (`Year`)",
-    x = "Año",
-    y = "Frecuencia"
-  )
+par(new = TRUE)
+
+boxplot(x, horizontal = TRUE, axes = FALSE, 
+        col = rgb(0, 1, 0, alpha = 0.5), 
+        at = 0.25, 
+        height = 0.005, 
+        whisklty = 1, whisklwd = 2, staplewex = 0.5, staplelwd = 2)
+
+box()
+
 ```
 
 Boxplot e histograma de `Average_Temperature_C`
 ```{r boxplot-temp}
-ggplot(climate_data, aes(y = Average_Temperature_C)) +
-  geom_boxplot(outlier.color = "red", fill = "lightblue") +
-  theme_minimal() +
-  labs(
-    title = "Boxplot de Temperatura Promedio (`Average_Temperature_C`)",
-    y = "Temperatura (Â°C)"
-  )
+x <- climate_data$Average_Temperature_C
 
+hist(x, prob = TRUE, 
+     col = "lightblue", 
+     main = "Histograma y Boxplot de Temperatura Promedio", 
+     xlab = "Temperatura Promedio (°C)", 
+     ylab = "Densidad")
 
-ggplot(climate_data, aes(x = Average_Temperature_C)) +
-  geom_histogram(binwidth = 0.5, fill = "lightblue", color = "black") +
-  theme_minimal() +
-  labs(
-    title = "Histograma de Temperatura Promedio (`Average_Temperature_C`)",
-    x = "Grados centigrados",
-    y = "Frecuencia"
-  )
+par(new = TRUE)
+
+boxplot(x, horizontal = TRUE, axes = FALSE, 
+        col = rgb(0, 1, 0, alpha = 0.5), 
+        at = 0.25, 
+        height = 0.005, 
+        whisklty = 1, whisklwd = 2, staplewex = 0.5, staplelwd = 2)
+
+box()
 ```
 
 Boxplot e historgama de `Total_Precipitation_mm`
 ```{r boxplot-precipitation}
-ggplot(climate_data, aes(y = Total_Precipitation_mm)) +
-  geom_boxplot(outlier.color = "red", fill = "lightblue") +
-  theme_minimal() +
-  labs(
-    title = "Boxplot de Precipitación Total (`Total_Precipitation_mm`)",
-    y = "Precipitación (mm)"
-  )
+x <- climate_data$Total_Precipitation_mm
 
+hist(x, prob = TRUE, 
+     col = "lightblue", 
+     main = "Histograma y Boxplot de Precipitación Total", 
+     xlab = "Precipitación Total (mm)", 
+     ylab = "Densidad")
 
-ggplot(climate_data, aes(x = Total_Precipitation_mm)) +
-  geom_histogram(binwidth = 0.5, fill = "lightblue", color = "black") +
-  theme_minimal() +
-  labs(
-    title = "Histograma de Precipitación Total (`Total_Precipitation_mm`)",
-    x = "Milimetros",
-    y = "Frecuencia"
-  )
+par(new = TRUE)
+
+boxplot(x, horizontal = TRUE, axes = FALSE, 
+        col = rgb(0, 1, 0, alpha = 0.5), 
+        at = 0.25, 
+        height = 0.005, 
+        whisklty = 1, whisklwd = 2, staplewex = 0.5, staplelwd = 2)
+
+box()
+
 ```
 
 Boxplot e histograma de `CO2_Emissions_MT`
 ```{r boxplot-co2}
-ggplot(climate_data, aes(y = CO2_Emissions_MT)) +
-  geom_boxplot(outlier.color = "red", fill = "lightblue") +
-  theme_minimal() +
-  labs(
-    title = "Boxplot de Emisiones de CO2 (`CO2_Emissions_MT`)",
-    y = "Emisiones (MT)"
-  )
+x <- climate_data$CO2_Emissions_MT
 
+hist(x, prob = TRUE, 
+     col = "lightblue", 
+     main = "Histograma y Boxplot de Emisiones de CO2", 
+     xlab = "Emisiones de CO2 (MT)", 
+     ylab = "Densidad")
 
-ggplot(climate_data, aes(x = CO2_Emissions_MT)) +
-  geom_histogram(binwidth = 0.5, fill = "lightblue", color = "black") +
-  theme_minimal() +
-  labs(
-    title = "Histograma de Emisiones de CO2 (`CO2_Emissions_MT`)",
-    x = "Toneladas métricas",
-    y = "Frecuencia"
-  )
+par(new = TRUE)
+
+boxplot(x, horizontal = TRUE, axes = FALSE, 
+        col = rgb(0, 1, 0, alpha = 0.5), 
+        at = 0.25, 
+        height = 0.005, 
+        whisklty = 1, whisklwd = 2, staplewex = 0.5, staplelwd = 2)
+
+box()
+
 ```
 
 Boxplot e histograma de `Extreme_Weather_Events`
 ```{r boxplot-weather-events}
-ggplot(climate_data, aes(y = Extreme_Weather_Events)) +
-  geom_boxplot(outlier.color = "red", fill = "lightblue") +
-  theme_minimal() +
-  labs(
-    title = "Boxplot de Eventos Climáticos Extremos (`Extreme_Weather_Events`)",
-    y = "Cantidad de Eventos"
-  )
+x <- climate_data$Extreme_Weather_Events
 
+hist(x, prob = TRUE, 
+     col = "lightblue", 
+     main = "Histograma y Boxplot de Eventos Climáticos Extremos", 
+     xlab = "Número de Eventos Climáticos Extremos", 
+     ylab = "Densidad")
 
-ggplot(climate_data, aes(x = Extreme_Weather_Events)) +
-  geom_histogram(binwidth = 0.5, fill = "lightblue", color = "black") +
-  theme_minimal() +
-  labs(
-    title = "Histograma de Eventos Climáticos Extremos (`Extreme_Weather_Events`)",
-    x = "Numero de eventos",
-    y = "Frecuencia"
-  )
+par(new = TRUE)
+
+boxplot(x, horizontal = TRUE, axes = FALSE, 
+        col = rgb(0, 1, 0, alpha = 0.5), 
+        at = 0.25, 
+        height = 0.005, 
+        whisklty = 1, whisklwd = 2, staplewex = 0.5, staplelwd = 2)
+
+box()
 ```
 
 Boxplot e histograma de `Irrigation_Access_%`
 ```{r boxplot-irrigation}
-ggplot(climate_data, aes(y = Irrigation_Access_.)) +
-  geom_boxplot(outlier.color = "red", fill = "lightblue") +
-  theme_minimal() +
-  labs(
-    title = "Boxplot de Acceso a Riego (`Irrigation_Access_%`)",
-    y = "Acceso (%)"
-  )
+x <- climate_data$Irrigation_Access_.
 
+hist(x, prob = TRUE, 
+     col = "lightblue", 
+     main = "Histograma y Boxplot de Acceso a Riego", 
+     xlab = "Porcentaje de Acceso a Riego (%)", 
+     ylab = "Densidad")
 
-ggplot(climate_data, aes(x = Irrigation_Access_.)) +
-  geom_histogram(binwidth = 0.5, fill = "lightblue", color = "black") +
-  theme_minimal() +
-  labs(
-    title = "Histograma de Acceso a Riego (`Irrigation_Access_.`)",
-    x = "Indx",
-    y = "Frecuencia"
-  )
+par(new = TRUE)
+
+boxplot(x, horizontal = TRUE, axes = FALSE, 
+        col = rgb(0, 1, 0, alpha = 0.5), 
+        at = 0.25, 
+        height = 0.005, 
+        whisklty = 1, whisklwd = 2, staplewex = 0.5, staplelwd = 2)
+
+box()
 ```
 
 Boxplot e histograma de `Pesticide_Use_KG_per_HA`
 ```{r boxplot-pesticide}
-ggplot(climate_data, aes(y = Pesticide_Use_KG_per_HA)) +
-  geom_boxplot(outlier.color = "red", fill = "lightblue") +
-  theme_minimal() +
-  labs(
-    title = "Boxplot de Uso de Pesticidas (`Pesticide_Use_KG_per_HA`)",
-    y = "Uso (KG/HA)"
-  )
+x <- climate_data$Pesticide_Use_KG_per_HA
 
+hist(x, prob = TRUE, 
+     col = "lightblue", 
+     main = "Histograma y Boxplot de Uso de Pesticidas", 
+     xlab = "Uso de Pesticidas (KG/HA)", 
+     ylab = "Densidad")
 
-ggplot(climate_data, aes(x = Pesticide_Use_KG_per_HA)) +
-  geom_histogram(binwidth = 0.5, fill = "lightblue", color = "black") +
-  theme_minimal() +
-  labs(
-    title = "Histograma de Uso de Pesticidas (`Pesticide_Use_KG_per_HA`)",
-    x = "KG per HA",
-    y = "Frecuencia"
-  )
+par(new = TRUE)
+
+boxplot(x, horizontal = TRUE, axes = FALSE, 
+        col = rgb(0, 1, 0, alpha = 0.5), 
+        at = 0.25, 
+        height = 0.005, 
+        whisklty = 1, whisklwd = 2, staplewex = 0.5, staplelwd = 2)
+
+box()
+
 ```
 
 Boxplot e histograma de `Fertilizer_Use_KG_per_HA`
 ```{r boxplot-fertilizer}
-ggplot(climate_data, aes(y = Fertilizer_Use_KG_per_HA)) +
-  geom_boxplot(outlier.color = "red", fill = "lightblue") +
-  theme_minimal() +
-  labs(
-    title = "Boxplot de Uso de Fertilizantes (`Fertilizer_Use_KG_per_HA`)",
-    y = "Uso (KG/HA)"
-  )
+x <- climate_data$Fertilizer_Use_KG_per_HA
 
-ggplot(climate_data, aes(x = Fertilizer_Use_KG_per_HA)) +
-  geom_histogram(binwidth = 0.5, fill = "lightblue", color = "black") +
-  theme_minimal() +
-  labs(
-    title = "Histograma de Uso de Fertilizantes (`Fertilizer_Use_KG_per_HA`)",
-    x = "KG per HA",
-    y = "Frecuencia"
-  )
+hist(x, prob = TRUE, 
+     col = "lightblue", 
+     main = "Histograma y Boxplot de Uso de Fertilizantes", 
+     xlab = "Uso de Fertilizantes (KG/HA)", 
+     ylab = "Densidad")
+
+par(new = TRUE)
+
+boxplot(x, horizontal = TRUE, axes = FALSE, 
+        col = rgb(0, 1, 0, alpha = 0.5), 
+        at = 0.25, 
+        height = 0.005, 
+        whisklty = 1, whisklwd = 2, staplewex = 0.5, staplelwd = 2)
+
+box()
+
 ```
 
 Boxplot e histograma de `Soil_Health_Index`
 ```{r boxplot-soil-health}
-ggplot(climate_data, aes(y = Soil_Health_Index)) +
-  geom_boxplot(outlier.color = "red", fill = "lightblue") +
-  theme_minimal() +
-  labs(
-    title = "Boxplot del Índice de Salud del Suelo (`Soil_Health_Index`)",
-    y = "Índice de Salud"
-  )
+x <- climate_data$Soil_Health_Index
 
-ggplot(climate_data, aes(x = Soil_Health_Index)) +
-  geom_histogram(binwidth = 0.5, fill = "lightblue", color = "black") +
-  theme_minimal() +
-  labs(
-    title = "Histograma de Índice de Salud del Suelo (`Soil_Health_Index`)",
-    x = "Indx",
-    y = "Frecuencia"
-  )
+hist(x, prob = TRUE, 
+     col = "lightblue", 
+     main = "Histograma y Boxplot del Índice de Salud del Suelo", 
+     xlab = "Índice de Salud del Suelo", 
+     ylab = "Densidad")
+
+par(new = TRUE)
+
+boxplot(x, horizontal = TRUE, axes = FALSE, 
+        col = rgb(0, 1, 0, alpha = 0.5), 
+        at = 0.25, 
+        height = 0.005, 
+        whisklty = 1, whisklwd = 2, staplewex = 0.5, staplelwd = 2)
+
+box()
+
 ```
 
 Boxplot e histograma de `Economic_Impact_Million_USD`
 ```{r boxplot-economic-impact}
-ggplot(climate_data, aes(y = Economic_Impact_Million_USD)) +
-  geom_boxplot(outlier.color = "red", fill = "lightblue") +
-  theme_minimal() +
-  labs(
-    title = "Boxplot del Impacto Económico (`Economic_Impact_Million_USD`)",
-    y = "Impacto (Millones USD)"
-  )
+x <- climate_data$Economic_Impact_Million_USD
 
-ggplot(climate_data, aes(x = Economic_Impact_Million_USD)) +
-  geom_histogram(binwidth = 0.5, fill = "lightblue", color = "black") +
-  theme_minimal() +
-  labs(
-    title = "Histograma del Impacto Económico (`Economic_Impact_Million_USD`)",
-    x = "Million USD",
-    y = "Frecuencia"
-  )
+hist(x, prob = TRUE, 
+     col = "lightblue", 
+     main = "Histograma y Boxplot del Impacto Económico", 
+     xlab = "Impacto Económico (Millones de USD)", 
+     ylab = "Densidad")
+
+par(new = TRUE)
+
+boxplot(x, horizontal = TRUE, axes = FALSE, 
+        col = rgb(0, 1, 0, alpha = 0.5), 
+        at = 0.25, 
+        height = 0.005, 
+        whisklty = 1, whisklwd = 2, staplewex = 0.5, staplelwd = 2)
+
+box()
+
 ```
 
 
 
-### Variables Categóricas: Tablas de Frecuencia
-A continuación, se presentan las tablas de frecuencia para las variables categóricas del dataset.
+## Variables Categóricas: Frecuencias
+A continuación, se presentan las frecuencias para las variables categóricas del dataset.
 
-Frecuencia  de Países **`Country`**
+Frecuencia de Países **`Country`**
 ```{r}
 # Crear la tabla de frecuencias y calcular el porcentaje
 var_freq <- as.data.frame(table(climate_data$Country))
@@ -455,27 +498,71 @@ ggplot(var_freq, aes(x = reorder(Adaptation_Strategies, -Frequency), y = Frequen
 ```
 
 
-### Pairwise scatter plots
-Obtengamos la información numérica 
+## Pairwise scatter plots
+Los gráficos de dispersión por pares son una herramienta visual poderosa para analizar relaciones entre múltiples variables numéricas. Al graficar cada par de variables en un conjunto de datos, podemos identificar patrones, tendencias, y posibles correlaciones lineales o no lineales entre ellas.
+
+Este enfoque es particularmente útil para:
+
+- Detectar relaciones lineales o no lineales entre variables.
+- Evitar multicolinaliedad.
 ```{r}
 numeric_vars <- climate_data[, sapply(climate_data, is.numeric)]
 ```
 
 Hagamos el plot
 ```{r}
-pairs(numeric_vars)
+# Fijar la semilla para reproducibilidad
+set.seed(123)
+
+# Seleccionar una muestra aleatoria de 500 filas
+sample_size <- 500
+climate_data_sample <- numeric_vars[sample(nrow(numeric_vars), sample_size), ]
+
+# Dibujar el gráfico de pares con la muestra
+pairs(climate_data_sample, 
+      main = "Pares para una Muestra Aleatoria de Datos",
+      pch = 19, 
+      cex = 0.5, 
+      col = rgb(0.2, 0.4, 0.6, 0.6))
 ```
 
-### Coeficientes empíricos de Pearson
-Veamos qué tan correlacionadas están nuestras variables utilizando el coeficiente empírico de Pearson
+## Coeficientes empíricos de Pearson
+El coeficiente de correlación de Pearson mide la relación lineal entre variables numéricas. Un valor cercano a 1 o -1 indica una fuerte correlación positiva o negativa, respectivamente, mientras que un valor cercano a 0 indica una correlación débil o inexistente.
+
+A continuación, calculamos la matriz de correlaciones para nuestras variables numéricas:
 ```{r}
-cor(numeric_vars)
+# Calcular la matriz de correlaciones
+cor_matrix <- cor(numeric_vars, use = "complete.obs")  # Ignorar valores NA
+
+# Convertir la matriz en un formato largo para ggplot
+cor_long <- melt(cor_matrix)
+
+# Crear el mapa de calor
+ggplot(cor_long, aes(x = Var1, y = Var2, fill = value)) +
+  geom_tile() +
+  scale_fill_gradient2(low = "blue", high = "red", mid = "white", midpoint = 0,
+                       limit = c(-1, 1), space = "Lab", name = "Correlación") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(
+    title = "Mapa de Calor de Correlaciones (Coeficiente de Pearson)",
+    x = "Variables",
+    y = "Variables"
+  )
+
 ```
 
 
-### Cálculo de Eta Squared para Variables Numéricas y Categóricas
+## Cálculo de Eta Squared para Variables Numéricas y Categóricas
 
-A continuación, se calculan los valores de \(\eta^2\) para cada combinación posible de una variable numérica continua y una variable categórica del dataset.
+El coeficiente Eta Squared mide la proporción de la varianza explicada de una variable numérica por una variable categórica. Este cálculo es útil para evaluar qué tan fuerte es la relación entre variables categóricas y numéricas en un conjunto de datos.
+
+Un valor de Eta Squared más alto indica que la variable categórica tiene un mayor efecto sobre la variable numérica, mientras que un valor cercano a 0 sugiere que la variable categórica no tiene un efecto significativo.
+
+Este análisis es particularmente valioso para:
+
+- Explorar la fuerza de asociación entre grupos definidos por una categoría y una medida cuantitativa.
+- Identificar variables categóricas relevantes para el análisis predictivo o explicativo.
 
 ```{r, warning=FALSE, results='hide', message=FALSE}
 
@@ -513,13 +600,6 @@ results <- expand.grid(
 
 # Mostrar resultados en una tabla ordenada
 results <- results %>% arrange(desc(Eta_Squared))
-```
-
-
-Los resultados ordenados por eta-squared se presentan a continuación.
-
-```{r eta-squared-results}
-# Mostrar resultados en una tabla
 kable(
   results,
   caption = "Resultados de Eta Squared para cada par de variables numéricas y categóricas"
@@ -528,17 +608,13 @@ kable(
 
 
 
-### Cálculo de Cramér's V para Variables Categóricas
+
+
+## Cálculo de Cramér's V para Variables Categóricas
 
 A continuación, se calcula el valor de Cramér's V (\(V\)) para cada combinación posible de dos variables categóricas del dataset.
 
 ```{r cramers-v-calculation, warning=FALSE, message=FALSE}
-# Instalar y cargar paquetes necesarios
-if (!require("vcd")) install.packages("vcd") # Para calcular Cramér's V
-if (!require("tidyverse")) install.packages("tidyverse") # Para manejo de datos
-library(vcd)
-library(tidyverse)
-
 # Seleccionar solo variables categóricas
 categorical_vars <- climate_data[, sapply(climate_data, is.character)]
 
@@ -566,16 +642,6 @@ results_cramers_v <- map_dfr(
 
 # Ordenar resultados por el valor de Cramér's V
 results_cramers_v <- results_cramers_v %>% arrange(desc(Cramers_V))
-```
-
-
-Los resultados de Cramér's V para cada combinación de variables categóricas se presentan a continuación.
-
-```{r cramers-v-results}
-# Mostrar resultados en una tabla
-if (!require("knitr")) install.packages("knitr")
-library(knitr)
-
 kable(
   results_cramers_v,
   caption = "Resultados de Cramér's V para cada par de variables categóricas"
@@ -583,60 +649,295 @@ kable(
 ```
 
 
-### Efectos categóricos
 
-Veamos si, para cada una de nuestras variables categóricas, las diferentes categorías tienen efecto sobre la media de **`Crop_Yield_MT_per_HA`**
 
-Test del efecto de **`Country`**
+## Modificaciones a los datos
+
+Como podemos observar, contamos con una amplia variedad de categorías. Para evitar multicolinealidad o una segmentación excesiva de nuestro conjunto de datos, optaremos por eliminar la variable **`Region`** y agrupar los valores de la variable **`Country`** por continentes.
 ```{r}
-summary(aov(Crop_Yield_MT_per_HA ~ Country, climate_data))
+# Elimina 'Region'
+climate_data <- climate_data %>% select(-Region)
+
+# Agrupar países en continentes
+climate_data$Continent <- countrycode(climate_data$Country, "country.name", "continent")
+
+# Elimina 'Country'
+climate_data <- climate_data %>% select(-Country)
+
 ```
 
-Test del efecto de **`Region`**
+Eliminaremos la columna **`Year`** del dataset porque su inclusión podría introducir una dependencia temporal que no es el enfoque principal de este análisis.
 ```{r}
-summary(aov(Crop_Yield_MT_per_HA ~ Region, climate_data))
-```
-
-Test del efecto de **`Crop_Type`**
-```{r}
-summary(aov(Crop_Yield_MT_per_HA ~ Crop_Type, climate_data))
-```
-
-Test del efecto de **`Adaptation_Strategies`**
-```{r}
-summary(aov(Crop_Yield_MT_per_HA ~ Adaptation_Strategies, climate_data))
-```
-
-
-
-### Modelo inicial
-
-Haremos un modelo con toda la información posible cambiando interceptos por cada variable categórica
-```{r}
-fit <- lm(Crop_Yield_MT_per_HA ~ ., data=climate_data)
-summary(fit)
+# Elimina 'Year'
+climate_data <- climate_data %>% select(-Year)
 ```
 
 
-### Modelo reducido
+La variable **`Economic_Impact_Million_USD`** representa el impacto económico estimado asociado a la productividad agrícola. Sin embargo, esta métrica se calcula posteriormente a la cosecha, ya que depende directamente de los rendimientos obtenidos y de factores externos como los precios de mercado y las políticas económicas. Por esta razón, no es adecuada para incluirla como predictor en este análisis
 ```{r}
-fitReduced <- lm(Crop_Yield_MT_per_HA ~ Average_Temperature_C + Total_Precipitation_mm + CO2_Emissions_MT, climate_data)
-summary(fitReduced)
+# Elimina 'Economic_Impact_Million_USD'
+climate_data <- climate_data %>% select(-Economic_Impact_Million_USD)
 ```
 
 
 
 
+## Modelos
+El histograma de la variable Crop_Yield_MT_per_HA muestra una distribución asimétrica positiva, lo que indica que los datos no son normales y están mejor representados por una distribución perteneciente a la familia exponencial, como la distribución gamma. Dado este comportamiento, utilizaremos un modelo lineal generalizado (GLM) con una distribución gamma para modelar esta variable.
+
+
+Para nuestro primer modelo, tomaremos la matriz de diseño siguiente
 
 
 
 
+```{r}
+# Ajustar el modelo GLM con enlace logarítmico
+glm_log <- glm(
+  Crop_Yield_MT_per_HA ~ ., 
+  data = climate_data, 
+  family = Gamma(link = "log")
+)
+summary(glm_log)
+```
+
+
+Inicialmente, empleamos una función liga logarítmica (log). Ahora, también exploraremos el uso de la función de enlace inversa (inverse).
+```{r}
+# Ajustar el modelo GLM con enlace inverso
+glm_inverse <- glm(
+  Crop_Yield_MT_per_HA ~ ., 
+  data = climate_data, 
+  family = Gamma(link = "inverse")
+)
+summary(glm_inverse)
+```
 
 
 
 
-<!-- ## Interpretación de Resultados -->
+Planteamos dos modelos reducidos
+
+```{r}
+# Ajustar el modelo GLM con enlace inverso
+glm_log.red <- glm(
+  Crop_Yield_MT_per_HA ~ Average_Temperature_C + CO2_Emissions_MT + Total_Precipitation_mm  + Crop_Type , 
+  data = climate_data, 
+  family = Gamma(link = "log")
+)
+summary(glm_log.red)
+```
+
+```{r}
+# Ajustar el modelo GLM con enlace inverso
+glm_inverse.red <- glm(
+  Crop_Yield_MT_per_HA ~ Average_Temperature_C + CO2_Emissions_MT + Total_Precipitation_mm  + Crop_Type , 
+  data = climate_data, 
+  family = Gamma(link = "inverse")
+)
+summary(glm_inverse.red)
+```
 
 
-<!-- ## Conclusiones -->
+## Bondad de Ajuste
 
+La bondad de ajuste también implica verificar que el modelo cumple con los supuestos teóricos bajo los cuales se construyó. 
+En el caso de un modelo lineal generalizado (GLM) con distribución gamma y enlace logarítmico, es importante asegurarse de que:
+
+\begin{enumerate}
+    \item \textbf{La distribución de los residuos} sigue el supuesto de la familia gamma.
+    \item \textbf{El enlace logarítmico} es adecuado para relacionar las variables predictoras con la variable objetivo.
+    \item \textbf{No existen valores atípicos extremos} que influyan de manera desproporcionada en el modelo.
+    \item \textbf{La dispersión residual} es razonable y consistente con los supuestos.
+\end{enumerate}
+
+A continuación, verificaremos estos aspectos mediante visualizaciones y métricas clave para asegurar que el modelo respeta sus supuestos fundamentales. 
+Esto es crucial para garantizar la validez de las inferencias y predicciones derivadas del modelo.
+
+
+
+### Investigación de Residuos
+
+\begin{enumerate}
+    \item Los \textbf{residuos de Pearson} verifican si la varianza está correctamente especificada. Estos deben estar centrados en 0 y tener una varianza aproximada de 1.
+    \item Los \textbf{residuos de Deviance} verifican si la función de enlace g() es apropiada. Si hay valores grandes en los residuos de deviance, podría ser que el enlace no sea correcto.
+\end{enumerate}
+
+
+```{r, echo=TRUE, results='hide', fig.show="hide"}
+# Función para crear gráficos de residuos vs valores predichos
+create_residual_vs_predicted <- function(model, model_name) {
+  # Residuos de Pearson
+  pearson_residuals <- residuals(model, type = "pearson")
+  pred_values <- predict(model, type = "response")
+  
+  scatter_pearson <- ggplot() +
+    aes(x = pred_values, y = pearson_residuals) +
+    geom_point(alpha = 0.5) +
+    geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+    labs(title = paste("Residuos de Pearson -", model_name), 
+         x = "Valores Predichos", 
+         y = "Residuos de Pearson") +
+    theme_minimal()
+  
+  # Residuos de Deviance
+  deviance_residuals <- residuals(model, type = "deviance")
+  
+  scatter_deviance <- ggplot() +
+    aes(x = pred_values, y = deviance_residuals) +
+    geom_point(alpha = 0.5) +
+    geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+    labs(title = paste("Residuos de Deviance -", model_name), 
+         x = "Valores Predichos", 
+         y = "Residuos de Deviance") +
+    theme_minimal()
+  
+  return(list(scatter_pearson, scatter_deviance))
+}
+
+# Crear las gráficas para cada modelo
+plots_log <- create_residual_vs_predicted(glm_log, "Log")
+plots_inverse <- create_residual_vs_predicted(glm_inverse, "Inverse")
+plots_log_red <- create_residual_vs_predicted(glm_log.red, "Log Reducido")
+plots_inverse_red <- create_residual_vs_predicted(glm_inverse.red, "Inverse Reducido")
+
+# Combinar todas las gráficas en una sola lista
+all_plots <- c(
+  plots_log, 
+  plots_inverse, 
+  plots_log_red, 
+  plots_inverse_red
+)
+
+# Crear una salida de dimensiones más grandes para que las gráficas no se vean aplastadas
+ggsave(
+  filename = "residual_plots_grid.png",  # Guardar como imagen
+  plot = grid.arrange(
+    grobs = all_plots,
+    nrow = 4,
+    ncol = 2,
+    top = "Comparación de Residuos para los Modelos",
+    heights = unit(c(1, 1, 1, 1), "null"),  # Ajustar proporciones para filas
+    widths = unit(c(1, 1), "null")          # Ajustar proporciones para columnas
+  ),
+  width = 12,  # Ancho total en pulgadas
+  height = 16  # Alto total en pulgadas,
+)
+```
+![Comparación de Residuos](residual_plots_grid.png)
+
+
+
+### Valores Atípicos
+```{r}
+# Función para calcular leverage y distancia de Cook
+detect_outliers <- function(model, model_name) {
+  leverage <- hatvalues(model)
+  cook_distance <- cooks.distance(model)
+  
+  # Umbrales
+  threshold_leverage <- 2 * mean(leverage)  # Umbral para leverage
+  threshold_cook <- 1  # Umbral fijo para Cook's distance
+  
+  # Identificar outliers
+  leverage_outliers <- which(leverage > threshold_leverage)
+  cook_outliers <- which(cook_distance > threshold_cook)
+  
+  # Combinar resultados
+  all_outliers <- unique(c(leverage_outliers, cook_outliers))
+  
+  # Manejo de casos donde no hay outliers
+  if (length(leverage_outliers) == 0) {
+    leverage_outliers <- "Ninguno"
+  }
+  if (length(cook_outliers) == 0) {
+    cook_outliers <- "Ninguno"
+  }
+  if (length(all_outliers) == 0) {
+    all_outliers <- "Ninguno"
+  }
+  
+  # Total de outliers
+  total_leverage <- if (is.numeric(leverage_outliers)) length(leverage_outliers) else 0
+  total_cook <- if (is.numeric(cook_outliers)) length(cook_outliers) else 0
+  total_all <- if (is.numeric(all_outliers)) length(all_outliers) else 0
+  
+  # Resultados
+  list(
+    modelo = model_name,
+    threshold_leverage = threshold_leverage,
+    threshold_cook = threshold_cook,
+    leverage_outliers = leverage_outliers,
+    cook_outliers = cook_outliers,
+    all_outliers = all_outliers,
+    total_leverage = total_leverage,
+    total_cook = total_cook,
+    total_all = total_all
+  )
+}
+
+# Aplicar la función a los 4 modelos
+outliers_log <- detect_outliers(glm_log, "Log")
+outliers_inverse <- detect_outliers(glm_inverse, "Inverse")
+outliers_log_red <- detect_outliers(glm_log.red, "Log Reducido")
+outliers_inverse_red <- detect_outliers(glm_inverse.red, "Inverse Reducido")
+
+# Mostrar resultados
+resultados <- list(outliers_log, outliers_inverse, outliers_log_red, outliers_inverse_red)
+
+# Imprimir resumen de resultados
+for (res in resultados) {
+  cat("\n--- Modelo:", res$modelo, "---\n")
+  cat("Umbral de Leverage:", res$threshold_leverage, "\n")
+  cat("Umbral de Cook:", res$threshold_cook, "\n")
+  cat("Total de Outliers por Leverage:", res$total_leverage, "\n")
+  cat("Total de Outliers por Cook:", res$total_cook, "\n")
+  cat("Total de Outliers combinados:", res$total_all, "\n")
+}
+
+
+
+
+# Función para graficar leverage vs Cook's distance
+plot_leverage_cook <- function(model, model_name) {
+  leverage <- hatvalues(model)  # Calcular leverage
+  cook_distance <- cooks.distance(model)  # Calcular distancia de Cook
+  
+  # Umbrales
+  threshold_leverage <- 2 * mean(leverage)
+  threshold_cook <- 1
+  
+  # Crear el gráfico
+  plot(
+    leverage, cook_distance, 
+    main = paste("Leverage vs Distancia de Cook -", model_name),
+    xlab = "Leverage",
+    ylab = "Distancia de Cook",
+    pch = 19, col = ifelse(leverage > threshold_leverage | cook_distance > threshold_cook, "red", "black")
+  )
+  
+  # Añadir líneas de umbral
+  abline(v = threshold_leverage, col = "blue", lty = 2)
+  abline(h = threshold_cook, col = "blue", lty = 2)
+  
+  # Leyenda
+  legend(
+    "topright", legend = c("Atípico", "Normal"),
+    col = c("red", "black"), pch = 19, bty = "n"
+  )
+}
+
+# Crear las gráficas para los 4 modelos
+par(mfrow = c(2, 2))  # Configurar una cuadrícula de 2x2 para las gráficas
+plot_leverage_cook(glm_log, "Log")
+plot_leverage_cook(glm_inverse, "Inverse")
+plot_leverage_cook(glm_log.red, "Log Reducido")
+plot_leverage_cook(glm_inverse.red, "Inverse Reducido")
+```
+
+
+
+<!-- # Interpretación de Resultados -->
+
+
+<!-- # Conclusiones -->
