@@ -121,6 +121,8 @@ if (!require("naniar")) install.packages("naniar") # Para visualizar datos falta
 if (!require("patchwork")) install.packages("patchwork")
 if (!require("gridExtra")) install.packages("gridExtra")
 if (!require("reshape2")) install.packages("reshape2")
+if (!require("boot")) install.packages("boot")
+library(boot)
 library(reshape2)
 library(gridExtra)
 library(patchwork)
@@ -679,16 +681,25 @@ La variable **`Economic_Impact_Million_USD`** representa el impacto económico e
 climate_data <- climate_data %>% select(-Economic_Impact_Million_USD)
 ```
 
+Estandarizaremos los datos antes de ajustarlos al modelo. La estandarización transforma las variables numéricas para que tengan media 0 y desviación estándar 1, lo que es especialmente importante cuando las variables tienen diferentes unidades o rangos. Esto permite que el modelo lineal generalizado (GLM) considere todas las variables en una escala comparable, reduciendo el impacto de aquellas con valores más grandes en la estimación de los coeficientes.
+```{r}
+# Función para estandarizar solo las variables predictoras
+standardize_predictors <- function(data, response_var) {
+  numeric_cols <- sapply(data, is.numeric)  # Identificar columnas numéricas
+  predictors <- numeric_cols & names(data) != response_var  # Excluir la variable objetivo
+  data[, predictors] <- scale(data[, predictors])  # Estandarizar solo las predictoras
+  return(data)
+}
+
+# Aplicar la estandarización al dataset
+response_var <- "Crop_Yield_MT_per_HA"  # Nombre de la variable objetivo
+climate_data <- standardize_predictors(climate_data, response_var)
+```
 
 
 
 ## Modelos
 El histograma de la variable Crop_Yield_MT_per_HA muestra una distribución asimétrica positiva, lo que indica que los datos no son normales y están mejor representados por una distribución perteneciente a la familia exponencial, como la distribución gamma. Dado este comportamiento, utilizaremos un modelo lineal generalizado (GLM) con una distribución gamma para modelar esta variable.
-
-
-Para nuestro primer modelo, tomaremos la matriz de diseño siguiente
-
-
 
 
 ```{r}
@@ -698,7 +709,6 @@ glm_log <- glm(
   data = climate_data, 
   family = Gamma(link = "log")
 )
-summary(glm_log)
 ```
 
 
@@ -716,27 +726,25 @@ summary(glm_inverse)
 
 
 
-Planteamos dos modelos reducidos
+Planteamos adicionalmente dos modelos reducidos
 
 ```{r}
-# Ajustar el modelo GLM con enlace inverso
+# Ajustar el modelo reducido GLM con enlace logaritmico
 glm_log.red <- glm(
-  Crop_Yield_MT_per_HA ~ Average_Temperature_C + CO2_Emissions_MT + Total_Precipitation_mm  + Crop_Type , 
+  Crop_Yield_MT_per_HA ~ Average_Temperature_C + CO2_Emissions_MT + Total_Precipitation_mm  + Crop_Type, 
   data = climate_data, 
   family = Gamma(link = "log")
 )
-summary(glm_log.red)
-```
 
-```{r}
-# Ajustar el modelo GLM con enlace inverso
+# Ajustar el modelo reducido GLM con enlace inverso
 glm_inverse.red <- glm(
-  Crop_Yield_MT_per_HA ~ Average_Temperature_C + CO2_Emissions_MT + Total_Precipitation_mm  + Crop_Type , 
+  Crop_Yield_MT_per_HA ~ Average_Temperature_C + CO2_Emissions_MT + Total_Precipitation_mm  + Crop_Type, 
   data = climate_data, 
   family = Gamma(link = "inverse")
 )
-summary(glm_inverse.red)
+
 ```
+
 
 
 ## Bondad de Ajuste
@@ -824,9 +832,24 @@ ggsave(
 ```
 ![Comparación de Residuos](residual_plots_grid.png)
 
+En nuestra investigación de residuos (Pearson y Deviance), encontramos que, en general, los residuos se comportan como se espera, mostrando una distribución aproximadamente centrada en cero con varianza constante, lo cual es consistente con los supuestos del modelo. Sin embargo, identificamos un pico inusual en los residuos hacia la mitad de los datos, lo que podría indicar la presencia de patrones no explicados completamente por el modelo. Resolver este problema requeriría un análisis más profundo y complejo con técnicas y conceptopsque quedan fuera del alcance de este curso. Por lo tanto, procederemos con los modelos actuales, conscientes de esta limitación.
 
 
 ### Valores Atípicos
+
+En esta sección, nos enfocaremos en la detección de valores atípicos (\textit{outliers}) que podrían estar influyendo de manera significativa en los resultados de nuestros modelos. Identificar y manejar estos valores es crucial para garantizar la robustez y confiabilidad de las estimaciones.
+
+Para ello, utilizaremos tres representaciones (gráficas y estadísticas) clave:
+\begin{enumerate}
+    \item \textbf{Leverage}: Nos permite identificar observaciones con un alto impacto en la estimación de los coeficientes debido a su posición en el espacio de las variables predictoras.
+    \item \textbf{Distancia de Cook}: Evalúa la influencia combinada de leverage y residuos en la calidad del ajuste del modelo. Valores altos indican observaciones con un impacto significativo en las predicciones.
+    \item \textbf{Gráfico Leverage vs Distancia de Cook}: Combina ambas métricas para proporcionar una visión completa de las observaciones influyentes.
+\end{enumerate}
+
+Con base en estas visualizaciones, identificaremos las observaciones que representen valores atípicos y procederemos a eliminarlas del conjunto de datos para asegurar un análisis más preciso y representativo. Este proceso nos permitirá ajustar modelos que reflejen de manera más fiel las tendencias y patrones en los datos.
+
+
+Calculemos los outliers
 ```{r}
 # Función para calcular leverage y distancia de Cook
 detect_outliers <- function(model, model_name) {
@@ -880,10 +903,9 @@ outliers_inverse <- detect_outliers(glm_inverse, "Inverse")
 outliers_log_red <- detect_outliers(glm_log.red, "Log Reducido")
 outliers_inverse_red <- detect_outliers(glm_inverse.red, "Inverse Reducido")
 
-# Mostrar resultados
+# Mostrar resultados de cada modelo
 resultados <- list(outliers_log, outliers_inverse, outliers_log_red, outliers_inverse_red)
 
-# Imprimir resumen de resultados
 for (res in resultados) {
   cat("\n--- Modelo:", res$modelo, "---\n")
   cat("Umbral de Leverage:", res$threshold_leverage, "\n")
@@ -893,9 +915,107 @@ for (res in resultados) {
   cat("Total de Outliers combinados:", res$total_all, "\n")
 }
 
+# Obtener el total de índices únicos de outliers combinados
+unique_outliers <- unique(c(
+  if (is.numeric(outliers_log$all_outliers)) outliers_log$all_outliers else numeric(0),
+  if (is.numeric(outliers_inverse$all_outliers)) outliers_inverse$all_outliers else numeric(0),
+  if (is.numeric(outliers_log_red$all_outliers)) outliers_log_red$all_outliers else numeric(0),
+  if (is.numeric(outliers_inverse_red$all_outliers)) outliers_inverse_red$all_outliers else numeric(0)
+))
+
+# Imprimir el total de índices únicos de outliers
+cat("\n--- Resumen General ---\n")
+cat("Total de índices únicos de outliers combinados:", length(unique_outliers), "\n")
+```
+
+Grafiquemos Leverage
+```{r}
+# Función para graficar leverage
+plot_leverage <- function(model, model_name) {
+  # Calcular leverage
+  leverage <- hatvalues(model)
+  
+  # Umbral de leverage
+  threshold_leverage <- 2 * mean(leverage)
+  
+  # Crear el gráfico
+  plot(
+    leverage,
+    main = paste("Gráfico de Leverage -", model_name),
+    xlab = "Índice de Observación",
+    ylab = "Leverage",
+    pch = 19, col = ifelse(leverage > threshold_leverage, "red", "blue")
+  )
+  
+  # Añadir línea del umbral
+  abline(h = threshold_leverage, col = "red", lty = 2)
+  
+  # Añadir leyenda
+  legend(
+    "topright", 
+    legend = c("Por Encima del Umbral", "Por Debajo del Umbral"),
+    col = c("red", "blue"), 
+    pch = 19, 
+    bty = "n"
+  )
+}
+
+# Crear las gráficas para los 4 modelos
+par(mfrow = c(2, 2))  # Configurar una cuadrícula de 2x2
+plot_leverage(glm_log, "Log")
+plot_leverage(glm_inverse, "Inverse")
+plot_leverage(glm_log.red, "Log Reducido")
+plot_leverage(glm_inverse.red, "Inverse Reducido")
+```
+
+Grafiquemos Distancia de Cook
+
+```{r}
+# Función para graficar distancia de Cook
+plot_cooks_distance <- function(model, model_name) {
+  # Calcular distancia de Cook
+  cook_distance <- cooks.distance(model)
+  
+  # Umbral de Cook
+  threshold_cook <- 1  # Umbral fijo
+  
+  # Crear el gráfico
+  plot(
+    cook_distance,
+    main = paste("Gráfico de Distancia de Cook -", model_name),
+    xlab = "Índice de Observación",
+    ylab = "Distancia de Cook",
+    pch = 19, col = ifelse(cook_distance > threshold_cook, "red", "blue")
+  )
+  
+  # Añadir línea del umbral
+  abline(h = threshold_cook, col = "red", lty = 2)
+  
+  # Añadir leyenda
+  legend(
+    "topright", 
+    legend = c("Por Encima del Umbral", "Por Debajo del Umbral"),
+    col = c("red", "blue"), 
+    pch = 19, 
+    bty = "n"
+  )
+}
+
+# Crear las gráficas para los 4 modelos
+par(mfrow = c(2, 2))  # Configurar una cuadrícula de 2x2
+plot_cooks_distance(glm_log, "Log")
+plot_cooks_distance(glm_inverse, "Inverse")
+plot_cooks_distance(glm_log.red, "Log Reducido")
+plot_cooks_distance(glm_inverse.red, "Inverse Reducido")
+
+
+```
 
 
 
+Ahora graficaremos Leverage vs. Distancia de Cook
+
+```{r}
 # Función para graficar leverage vs Cook's distance
 plot_leverage_cook <- function(model, model_name) {
   leverage <- hatvalues(model)  # Calcular leverage
@@ -932,6 +1052,219 @@ plot_leverage_cook(glm_inverse, "Inverse")
 plot_leverage_cook(glm_log.red, "Log Reducido")
 plot_leverage_cook(glm_inverse.red, "Inverse Reducido")
 ```
+
+
+En nuestra base de datos de 10,000 observaciones, identificamos 80 valores atípicos a través de los cuatro modelos. Estos outliers representan el 0.8% del total de los datos. Dado que pueden afectar al ajuste de nuestro modelo de manera desproporcionada y, considerando su bajo porcentaje, procedemos a eliminarlos.
+
+```{r}
+# Función para eliminar outliers del dataset
+remove_outliers <- function(data, outliers_indices) {
+  # Verificar si los índices de outliers son válidos
+  if (length(outliers_indices) == 0) {
+    return(data)  # Devolver el dataset original si no hay outliers
+  }
+  # Excluir las filas identificadas como outliers
+  data_clean <- data[-outliers_indices, ]
+  return(data_clean)
+}
+
+# Verificar y combinar los índices de outliers
+outliers_combined <- unique(c(
+  if (is.numeric(outliers_log$all_outliers)) outliers_log$all_outliers else numeric(0),
+  if (is.numeric(outliers_inverse$all_outliers)) outliers_inverse$all_outliers else numeric(0),
+  if (is.numeric(outliers_log_red$all_outliers)) outliers_log_red$all_outliers else numeric(0),
+  if (is.numeric(outliers_inverse_red$all_outliers)) outliers_inverse_red$all_outliers else numeric(0)
+))
+
+# Crear un nuevo dataset sin outliers
+climate_data_clean <- remove_outliers(climate_data, outliers_combined)
+
+# Mostrar el número de observaciones antes y después
+cat("Número de observaciones antes de eliminar outliers:", nrow(climate_data), "\n")
+cat("Número de observaciones después de eliminar outliers:", nrow(climate_data_clean), "\n")
+cat("Total de outliers eliminados:", length(outliers_combined), "\n")
+
+```
+
+Volvemos a ajustar con datasets sin outliers
+
+```{r}
+# Ajustamos
+glm_log_clean <- glm(
+  Crop_Yield_MT_per_HA ~ ., 
+  data = climate_data_clean, 
+  family = Gamma(link = "log")
+)
+
+glm_inverse_clean <- glm(
+  Crop_Yield_MT_per_HA ~ ., 
+  data = climate_data_clean, 
+  family = Gamma(link = "inverse")
+)
+
+glm_log_red_clean <- glm(
+  Crop_Yield_MT_per_HA ~ Average_Temperature_C + CO2_Emissions_MT + Total_Precipitation_mm + Crop_Type, 
+  data = climate_data_clean, 
+  family = Gamma(link = "log")
+)
+
+glm_inverse_red_clean <- glm(
+  Crop_Yield_MT_per_HA ~ Average_Temperature_C + CO2_Emissions_MT + Total_Precipitation_mm + Crop_Type, 
+  data = climate_data_clean, 
+  family = Gamma(link = "inverse")
+)
+```
+
+
+## Comparación de modelos
+
+En esta sección, evaluaremos y compararemos los cuatro modelos ajustados utilizando diversas métricas de desempeño y técnicas de contraste. Para identificar el modelo que mejor se ajusta a nuestros datos, analizaremos el \textbf{AIC} (Criterio de Información de Akaike) y el \textbf{BIC} (Criterio de Información Bayesiano), que penalizan la complejidad del modelo en favor de su simplicidad. También incluiremos la \textbf{pseudo \(R^2\)} de McFadden como una medida relativa de la calidad del ajuste, proporcionando una visión general de la capacidad explicativa de cada modelo.
+
+Adicionalmente, compararemos los modelos reducidos con sus modelos padres a través de dos pruebas estadísticas para modelos anidados: la \textbf{Prueba de Razón de Verosimilitudes (LRT)} y el \textbf{Deviance Test}, que nos permitirán evaluar si los modelos reducidos son significativamente peores que sus contrapartes completas o si la reducción es válida sin pérdida sustancial de información. Este análisis integral nos ayudará a seleccionar el modelo más adecuado desde una perspectiva tanto estadística como práctica.
+
+
+
+### Comparaciónes con AIC, BIC y \textbf{pseudo \(R^2\)}
+
+```{r}
+# Función para calcular la pseudo R^2 (McFadden's R^2)
+calculate_pseudo_r2 <- function(model) {
+  null_deviance <- model$null.deviance
+  residual_deviance <- model$deviance
+  pseudo_r2 <- 1 - (residual_deviance / null_deviance)
+  return(pseudo_r2)
+}
+
+# Crear una lista con los modelos refitteados
+models <- list(
+  Log = glm_log_clean,
+  Inverse = glm_inverse_clean,
+  Log_Reducido = glm_log_red_clean,
+  Inverse_Reducido = glm_inverse_red_clean
+)
+
+# Calcular AIC, BIC y pseudo R^2 para cada modelo
+comparison <- data.frame(
+  Modelo = names(models),
+  AIC = sapply(models, AIC),
+  BIC = sapply(models, BIC),
+  Pseudo_R2 = sapply(models, calculate_pseudo_r2)
+)
+
+# Ordenar por AIC
+comparison <- comparison[order(comparison$AIC), ]
+
+# Mostrar la tabla comparativa
+print(comparison)
+
+```
+
+El modelo Log Reducido tiene el menor AIC (26824.27), lo que sugiere que es el modelo que mejor predice sin aumentar demasiado su complejidad. El modelo Log Reducido tiene el menor BIC (26925.10), lo que lo hace el preferible si lo que se busca es un modelo más general que preciso.El modelo Log tiene el mayor pseudo \(R^2\) (0.0798), lo que significa que explica ligeramente más variabilidad en los datos que los otros modelos.
+
+
+
+### Comparaciones anidadas
+
+```{r}
+# Función para realizar las pruebas y formatear resultados en texto
+nested_model_tests_text <- function(full_model, reduced_model, model_name) {
+  # Prueba de Razón de Verosimilitudes (LRT)
+  lrt <- anova(reduced_model, full_model, test = "LRT")
+  
+  # Deviance Test
+  deviance_diff <- reduced_model$deviance - full_model$deviance
+  df_diff <- reduced_model$df.residual - full_model$df.residual
+  p_value_deviance <- pchisq(deviance_diff, df = abs(df_diff), lower.tail = FALSE)
+  
+  # Formatear y mostrar resultados
+  cat("\n\n\n--- Comparación de Modelos (", model_name, ") ---\n", sep = "")
+  
+  cat("\nPrueba de Razón de Verosimilitudes (LRT):\n")
+  cat("  - Grados de libertad residuales (reducido): ", reduced_model$df.residual, "\n")
+  cat("  - Grados de libertad residuales (completo): ", full_model$df.residual, "\n")
+  cat("  - Deviancia residual (reducido): ", round(reduced_model$deviance, 2), "\n")
+  cat("  - Deviancia residual (completo): ", round(full_model$deviance, 2), "\n")
+  cat("  - Diferencia de chi-cuadrado: ", round(lrt[2, "Deviance"], 2), "\n")
+  cat("  - P-valor: ", format.pval(lrt[2, "Pr(>Chi)"]), "\n")
+  
+  cat("\nPrueba de Deviancia:\n")
+  cat("  - Diferencia de deviancia: ", round(deviance_diff, 2), "\n")
+  cat("  - Diferencia de grados de libertad: ", abs(df_diff), "\n")
+  cat("  - P-valor: ", format.pval(p_value_deviance), "\n")
+}
+
+# Comparar modelos completos vs reducidos
+nested_model_tests_text(glm_log_clean, glm_log_red_clean, "Modelo Log")
+nested_model_tests_text(glm_inverse_clean, glm_inverse_red_clean, "Modelo Inverse")
+
+```
+
+Los resultados de las pruebas de comparación entre los modelos completos y reducidos muestran valores \(p\) altos (\(p > 0.05\)) en ambas pruebas, indicando que no hay evidencia estadística suficiente para rechazar la hipótesis nula. Esto sugiere que los modelos reducidos ofrecen un ajuste comparable al de los modelos completos, por lo que podemos utilizarlos sin pérdida significativa de información.
+
+
+### Cross validation
+
+En esta sección, realizamos un análisis de validación cruzada para evaluar el desempeño predictivo de los modelos ajustados. Utilizamos un esquema de \textbf{10 folds} repetido \textbf{100 veces} para obtener una medida confiable de la deviancia promedio. La \textit{deviancia total} se calcula como una métrica que evalúa qué tan bien cada modelo ajusta los datos observados, penalizando las discrepancias entre los valores predichos y los reales.
+
+
+```{r, message=FALSE, warning=FALSE}
+# Definir la función de deviance gamma
+gamma_deviance <- function(y, mu) {
+  return(2 * sum(((y - mu) / mu) - log(y / mu)))
+}
+
+# Realizar validación cruzada usando cv.glm
+perform_cv_glm <- function(model, data, k_folds = 10) {
+  set.seed(456)  # Semilla para reproducibilidad
+  
+  # Validación cruzada con cv.glm
+  cv_results <- cv.glm(
+    data = data,
+    glmfit = model,
+    cost = gamma_deviance,  # Utilizamos la deviance gamma como métrica
+    K = k_folds
+  )
+  
+  # Retornar el costo (Deviance)
+  return(cv_results$delta[1])  # delta[1] es el error
+}
+
+# Aplicar validación cruzada a cada modelo
+cv_deviance_results <- data.frame(
+  Modelo = c("Log", "Log Reducido", "Inverse", "Inverse Reducido"),
+  Deviance = c(
+    perform_cv_glm(glm_log_clean, climate_data_clean),
+    perform_cv_glm(glm_log_red_clean, climate_data_clean),
+    perform_cv_glm(glm_inverse_clean, climate_data_clean),
+    perform_cv_glm(glm_inverse_red_clean, climate_data_clean)
+  )
+)
+
+# Mostrar resultados
+print(cv_deviance_results)
+```
+
+El modelo Log Reducido tiene, en promedio, un Deviance menor al evaular el modelo, lo que indica que es el modelo que ofrece el mejor ajuste para nuestros datos. Los modelos con enlace inverso presentan un peor desempeño (mayor deviance). Los modelos reducidos presentan un mejor desempeño que sus contrapartes (modelos completos).
+
+
+
+## Pruebas sobre coeficientes
+
+Primero, evaluaremos la significancia estadística de los coeficientes estimados en los modelos ajustados. Esto nos permitirá identificar cuáles variables tienen un impacto significativo en la variable de respuesta y cuáles podrían considerarse irrelevantes. Para ello, utilizaremos pruebas z (asintoticamente) expuestas en el summary del fit, donde la hipótesis nula establece que el coeficiente es igual a cero (\(H_0: \beta_i = 0\)). Este análisis nos ayudará a comprender mejor las relaciones entre las variables predictoras y la productividad agrícola, y a justificar la inclusión o exclusión de variables en los modelos reducidos.
+
+
+```{r}
+
+cat("\n--- Summary de modelo con liga log ---\n", sep = "")
+summary(glm_log_clean)
+cat("\n\n--- Summary de modelo con liga inv ---\n", sep = "")
+summary(glm_inverse_clean)
+cat("\n\n--- Summary de modelo reducido con liga log ---\n", sep = "")
+summary(glm_log_red_clean)
+cat("\n\n--- Summary de modelo reducido con liga inv ---\n", sep = "")
+summary(glm_inverse_red_clean)
+```
+
 
 
 
