@@ -2,9 +2,7 @@
 title: "Proyecto Final - Efecto del Clima y Factores Ambientales en la Productividad
   Agrícola"
 author: "Est. Apl. 2"
-output:
-  pdf_document: default
-  html_document: default
+output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
@@ -553,6 +551,7 @@ ggplot(cor_long, aes(x = Var1, y = Var2, fill = value)) +
   )
 
 ```
+Observamos que no tenemos problemas de multicolienaliedad entre variables explicatorias excepto en Economic_Impact_Million_USD. Esto lo resolveremos en la sección `Modificación de Datos`.
 
 
 ## Cálculo de Eta Squared para Variables Numéricas y Categóricas
@@ -608,6 +607,7 @@ kable(
 )
 ```
 
+Vemos que no tenemos problemas de multicolinealiedad entre nuestras variables explicatorias continuas y categoricas.
 
 
 
@@ -649,13 +649,12 @@ kable(
   caption = "Resultados de Cramér's V para cada par de variables categóricas"
 )
 ```
-
-
+Vemos que solo tenemos problemas de multicolinealiedad entre Country y Region, problema que resolveremos en la seeción siguiente. En cuanto a las demas variables categoricas, no tenemos problemas de multicolinealiedad entre ellas.
 
 
 ## Modificaciones a los datos
 
-Como podemos observar, contamos con una amplia variedad de categorías. Para evitar multicolinealidad o una segmentación excesiva de nuestro conjunto de datos, optaremos por eliminar la variable **`Region`** y agrupar los valores de la variable **`Country`** por continentes.
+Como podemos observar, contamos con una amplia variedad de categorías. Para evitar multicolinealida, así como una segmentación excesiva de nuestro conjunto de datos, optaremos por eliminar la variable **`Region`** y agrupar los valores de la variable **`Country`** por continentes.
 ```{r}
 # Elimina 'Region'
 climate_data <- climate_data %>% select(-Region)
@@ -702,6 +701,85 @@ climate_data <- standardize_predictors(climate_data, response_var)
 El histograma de la variable Crop_Yield_MT_per_HA muestra una distribución asimétrica positiva, lo que indica que los datos no son normales y están mejor representados por una distribución perteneciente a la familia exponencial, como la distribución gamma. Dado este comportamiento, utilizaremos un modelo lineal generalizado (GLM) con una distribución gamma para modelar esta variable.
 
 
+En el modelo ajustado, la variable \( Y \) (productividad agrícola, \texttt{Crop\_Yield\_MT\_per\_HA}) se asume que sigue una \textbf{distribución Gamma}. Su distribución puede expresarse de la siguiente manera:
+
+\[
+Y_i \sim \text{Gamma}(\alpha, \beta)
+\]
+
+La forma general de la familia exponencial para esta Gamma es:
+
+\[
+f(y; \alpha, \beta) = \frac{\beta^\alpha}{\Gamma(\alpha)} y^{\alpha - 1} e^{-\beta y}, \quad y > 0,
+\]
+
+donde identificamos los términos de la forma de la familia exponencial:
+\begin{itemize}
+    \item El parámetro natural es \( \theta = -\beta \),
+    \item El parámetro de dispersión es \( \phi = 1 \),
+    \item La función log-partición es \( b(\theta) = -\alpha \log(-\theta) \), donde \( -\theta = \beta \),
+    \item La función base es \( c(y; \phi) = (\alpha - 1) \log y - \log \Gamma(\alpha) \).
+\end{itemize}
+
+y tenemos que  
+
+\[
+\mathbb{E}[Y] = b'(\theta) = \mu = g^{-1}(\eta)
+\]
+
+\[
+\text{Var}(Y) = \phi b''(\theta) = \phi V(\mu) = \phi V(g^{-1}(\eta))
+\]
+
+donde \( \eta = \mathbf{X} \boldsymbol{\beta} \) y \( V(\cdot) \) es la función de varianza, \( g() \) es la función liga, \(\mathbf{X}\) es la matriz diseño y \( \boldsymbol{\beta} \) el vector de coeficientes.
+
+
+Comenzamos planteando un modelo con la siguiente liga y definición de \( \eta \):
+
+\[
+\boldsymbol{\beta} \in \mathbb{R}^{26}, \quad \mathbf{X} \in \mathbb{R}^{10000 \times 26}, \eta \in \mathbb{R}^{10000}
+\]
+
+
+\begin{align*}
+\eta_i &= \beta_0 
++ \beta_1 \cdot D_{\text{Crop\_TypeCoffee}}(i) 
++ \beta_2 \cdot D_{\text{Crop\_TypeCorn}}(i) + \beta_3 \cdot D_{\text{Crop\_TypeCotton}}(i) + \beta_4 \cdot D_{\text{Crop\_TypeFruits}}(i) \\
+&+ \beta_5 \cdot D_{\text{Crop\_TypeRice}}(i) 
++ \beta_6 \cdot D_{\text{Crop\_TypeSoybeans}}(i) 
++ \beta_7 \cdot D_{\text{Crop\_TypeSugarcane}}(i) 
++ \beta_8 \cdot D_{\text{Crop\_TypeVegetables}}(i) \\
+&+ \beta_9 \cdot D_{\text{Crop\_TypeWheat}}(i) 
++ \beta_{10} \cdot \text{Average\_Temperature\_C}_i 
++ \beta_{11} \cdot \text{Total\_Precipitation\_mm}_i \\
+&+ \beta_{12} \cdot \text{CO2\_Emissions\_MT}_i 
++ \beta_{13} \cdot \text{Extreme\_Weather\_Events}_i 
++ \beta_{14} \cdot \text{Irrigation\_Access\_}_i \\
+&+ \beta_{15} \cdot \text{Pesticide\_Use\_KG\_per\_HA}_i 
++ \beta_{16} \cdot \text{Fertilizer\_Use\_KG\_per\_HA}_i 
++ \beta_{17} \cdot \text{Soil\_Health\_Index}_i \\
+&+ \beta_{18} \cdot D_{\text{Adaptation\_StrategiesDrought-resistant\_Crops}}(i) 
++ \beta_{19} \cdot D_{\text{Adaptation\_StrategiesNo\_Adaptation}}(i) \\
+&+ \beta_{20} \cdot D_{\text{Adaptation\_StrategiesOrganic\_Farming}}(i)
++ \beta_{21} \cdot D_{\text{Adaptation\_StrategiesWater\_Management}}(i) 
++ \beta_{22} \cdot D_{\text{ContinentAmericas}}(i) \\
+&+ \beta_{23} \cdot D_{\text{ContinentAsia}}(i)
++ \beta_{24} \cdot D_{\text{ContinentEurope}}(i) 
++ \beta_{25} \cdot D_{\text{ContinentOceania}}(i).
+\end{align*}
+
+\[
+g(\mu) = \log(\mu), \quad \text{donde } g(\cdot) \text{ es la función liga log.}
+\]
+
+Por lo que
+
+\[ \mathbb{E}[Y_i] =  \mu_i = e^{\eta_i}\]
+
+
+
+
+Ajustamos dicho modelo
 ```{r}
 # Ajustar el modelo GLM con enlace logarítmico
 glm_log <- glm(
@@ -713,6 +791,18 @@ glm_log <- glm(
 
 
 Inicialmente, empleamos una función liga logarítmica (log). Ahora, también exploraremos el uso de la función de enlace inversa (inverse).
+
+
+\[
+g(\mu) = \frac{1}{\mu}
+\]
+
+Por lo que
+
+\[ \mathbb{E}[Y_i] =  \mu_i = \frac{1}{\eta_i}\]
+
+Ajustamos
+
 ```{r}
 # Ajustar el modelo GLM con enlace inverso
 glm_inverse <- glm(
@@ -720,13 +810,44 @@ glm_inverse <- glm(
   data = climate_data, 
   family = Gamma(link = "inverse")
 )
-summary(glm_inverse)
 ```
 
 
 
 
-Planteamos adicionalmente dos modelos reducidos
+Planteamos adicionalmente dos modelos reducidos con la siguiente definición de \( X, \eta \)
+
+\[
+\boldsymbol{\beta} \in \mathbb{R}^{13}, \quad \mathbf{X} \in \mathbb{R}^{10000 \times 13}, \eta \in \mathbb{R}^{10000}
+\]
+
+\begin{align*}
+\eta_i &= \beta_0 
++ \beta_{1} \cdot \text{Average\_Temperature\_C}_i 
++ \beta_{2} \cdot \text{CO2\_Emissions\_MT}_i 
++ \beta_{3} \cdot \text{Total\_Precipitation\_mm}_i \\
+&+ \beta_4 \cdot D_{\text{Crop\_TypeCoffee}}(i) 
++ \beta_5 \cdot D_{\text{Crop\_TypeCorn}}(i) 
++ \beta_6 \cdot D_{\text{Crop\_TypeCotton}}(i) 
++ \beta_7 \cdot D_{\text{Crop\_TypeFruits}}(i) \\
+&+ \beta_8 \cdot D_{\text{Crop\_TypeRice}}(i) 
++ \beta_9 \cdot D_{\text{Crop\_TypeSoybeans}}(i) 
++ \beta_{10} \cdot D_{\text{Crop\_TypeSugarcane}}(i) 
++ \beta_{11} \cdot D_{\text{Crop\_TypeVegetables}}(i) \\
+&+ \beta_{12} \cdot D_{\text{Crop\_TypeWheat}}(i) 
+\end{align*}
+
+
+En el primer modelo
+\[
+g(\mu) = \log(\mu), \quad \text{donde } g(\cdot) \text{ es la función liga log.}
+\]
+
+Por lo que
+
+\[ \mathbb{E}[Y_i] =  \mu_i = e^{\eta_i}\]
+
+Ajustamos
 
 ```{r}
 # Ajustar el modelo reducido GLM con enlace logaritmico
@@ -735,14 +856,25 @@ glm_log.red <- glm(
   data = climate_data, 
   family = Gamma(link = "log")
 )
+```
 
+En el segundo
+\[
+g(\mu) = \frac{1}{\mu}
+\]
+
+Por lo que
+
+\[ \mathbb{E}[Y_i] =  \mu_i = \frac{1}{\eta_i}\]
+
+Ajustamos
+```{r}
 # Ajustar el modelo reducido GLM con enlace inverso
 glm_inverse.red <- glm(
   Crop_Yield_MT_per_HA ~ Average_Temperature_C + CO2_Emissions_MT + Total_Precipitation_mm  + Crop_Type, 
   data = climate_data, 
   family = Gamma(link = "inverse")
 )
-
 ```
 
 
@@ -830,9 +962,14 @@ ggsave(
   height = 16  # Alto total en pulgadas
 )
 ```
-![Comparación de Residuos](residual_plots_grid.png)
+\begin{figure}
+\centering
+\includegraphics[width=0.8\textwidth]{residual_plots_grid.png}
+\caption{Comparación de Residuos.}
+\label{fig:residual-plots}
+\end{figure}
 
-En nuestra investigación de residuos (Pearson y Deviance), encontramos que, en general, los residuos se comportan como se espera, mostrando una distribución aproximadamente centrada en cero con varianza constante, lo cual es consistente con los supuestos del modelo. Sin embargo, identificamos un pico inusual en los residuos hacia la mitad de los datos, lo que podría indicar la presencia de patrones no explicados completamente por el modelo. Resolver este problema requeriría un análisis más profundo y complejo con técnicas y conceptopsque quedan fuera del alcance de este curso. Por lo tanto, procederemos con los modelos actuales, conscientes de esta limitación.
+En nuestra investigación de residuos (Pearson y Deviance) **Figura \ref{fig:residual-plots}** , encontramos que, en general, los residuos se comportan como se espera, mostrando una distribución aproximadamente centrada en cero con varianza constante, lo cual es consistente con los supuestos del modelo. Sin embargo, identificamos un pico inusual en los residuos hacia la mitad de los datos, lo que podría indicar la presencia de patrones no explicados completamente por el modelo. Resolver este problema requeriría un análisis más profundo y complejo con técnicas y conceptopsque quedan fuera del alcance de este curso. Por lo tanto, procederemos con los modelos actuales, conscientes de esta limitación.
 
 
 ### Valores Atípicos
