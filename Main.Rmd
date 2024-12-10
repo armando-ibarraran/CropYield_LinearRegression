@@ -11,34 +11,56 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Introducción al Problema
 
-La productividad agrícola es fundamental para la seguridad alimentaria y el desarrollo económico de muchas regiones del mundo. El cambio climático y las fluctuaciones ambientales han generado preocupaciones sobre cómo estos factores influyen en el rendimiento de los cultivos y, en consecuencia, en la sostenibilidad de la agricultura a nivel global. 
+La agricultura desempeña un papel esencial en la seguridad alimentaria y el desarrollo económico global. Sin embargo, la creciente presión de factores como el cambio climático, el agotamiento de recursos naturales y la degradación del suelo ha planteado desafíos sin precedentes para mantener niveles sostenibles de productividad agrícola. En este contexto, comprender la relación entre los factores climáticos y la productividad agrícola se convierte en una prioridad para investigadores, responsables de políticas y agricultores.
 
-Este análisis busca comprender el efecto que las condiciones climáticas y los factores ambientales tienen sobre la productividad agrícola. La relevancia de este problema radica en su impacto directo sobre la capacidad de los países para satisfacer las demandas alimenticias de su población, especialmente en un contexto de cambio climático y creciente presión sobre los recursos naturales.
+Este proyecto tiene como objetivo identificar y cuantificar el efecto de factores como la temperatura promedio, la precipitación total, las emisiones de CO2 y los eventos climáticos extremos en la productividad agrícola. Utilizando herramientas estadísticas avanzadas y datos globales, buscamos responder preguntas estas críticas:
 
-A partir de este contexto, se plantea responder a las siguientes preguntas de investigación mediante un análisis estadístico:  
-1. ¿Qué factores ambientales tienen un efecto significativo en la productividad agrícola? 
-2. ¿Qué modelo estadístico ofrece la mejor predicción de la productividad?
+- ¿Qué factores ambientales tienen un efecto significativo en los cultivos? 
+- ¿Qué modelo predictivo permite estimar con mayor precisión la productividad agrícola bajo diferentes escenarios climáticos?
 
-El objetivo de este análisis es aportar información que pueda ser útil para diseñar políticas y estrategias agrícolas más resilientes y sostenibles en el futuro.
-
+La relevancia de este análisis radica en su potencial para guiar decisiones informadas. Con la implementación de modelos estadísticos robustos, es posible no solo identificar las variables más influyentes, sino también evaluar cómo estas interacciones pueden informar estrategias de adaptación, como el manejo eficiente del agua, la selección de cultivos más resistentes y el diseño de políticas agrícolas sostenibles. Este estudio pretende contribuir a la construcción de sistemas agrícolas más resilientes, capaces de enfrentar los desafíos del siglo XXI.
 
 
 
+# Resumen del Análisis Estadístico
+
+El presente proyecto analiza la influencia de factores climáticos y ambientales en la productividad agrícola global, utilizando un modelo estadístico basado en datos provenientes de distintas regiones del mundo. Se trabajó con un conjunto de datos de Kaggle compuesto por más de 10,000 observaciones y variables clave como temperatura promedio, precipitación total, tipo de cultivo y eventos climáticos extremos. La variable objetivo, productividad agrícola medida en toneladas métricas por hectárea, presentó una distribución asimétrica positiva, lo que motivó el uso de modelos lineales generalizados (GLM) con distribución Gamma y enlaces logarítmico e inverso.
+
+A través de comparaciones basadas en AIC, BIC y pseudo $R^2$, el modelo reducido con enlace logarítmico emergió como el más eficiente, con un AIC de 26824.27 y un pseudo $R^2$ de 0.0788. Este modelo identificó la temperatura promedio, la precipitación y el tipo de cultivo como los predictores más relevantes. Los gráficos de residuos confirmaron la validez del modelo, aunque algunos patrones residuales sugieren la necesidad de estudios más profundos.
+
+En el análisis de correlaciones, se destacó que la relación entre la temperatura promedio y la productividad agrícola no es lineal; se observa un incremento en la productividad a medida que las temperaturas aumentan hasta un rango óptimo ($\sim 25^\circ C$), pero más allá de este umbral, los rendimientos disminuyen drásticamente. Esta relación concuerda con estudios previos que indican que temperaturas extremadamente altas generan estrés térmico en los cultivos. Adicionalmente, aunque las precipitaciones mostraron una correlación más débil, se identificó que tanto los déficits como los excesos de lluvia afectan negativamente el rendimiento, confirmando la necesidad de un equilibrio hídrico para maximizar la productividad agrícola.
+
+Otro aspecto estadístico relevante fue la evaluación de interacciones entre variables categóricas y numéricas utilizando el coeficiente Eta Squared, que mostró que las regiones explican una mayor proporción de la variabilidad en la productividad agrícola en comparación con factores como el tipo de cultivo o las estrategias de adaptación. Este hallazgo refuerza la importancia del contexto geográfico en la productividad agrícola. Por su parte, los resultados del cálculo de Cramér’s V entre variables categóricas revelaron una fuerte asociación entre las regiones y los tipos de cultivos, lo que sugiere que ciertas áreas están especializadas en cultivos específicos debido a su clima y características edafológicas. Estas interacciones fueron fundamentales para ajustar los modelos predictivos de manera más precisa.
+
+En conclusión, el análisis revela que los efectos del clima, en particular temperaturas extremas y precipitaciones fuera de rango, son factores críticos que influyen en la productividad agrícola. Este proyecto ofrece herramientas para guiar políticas agrícolas y estrategias adaptativas, como el manejo eficiente de recursos hídricos y la selección de cultivos más resilientes, en un contexto de cambio climático.
 
 
 
-<!-- # Resumen del Análisis Estadístico -->
+# Marco Teórico
 
+## Variabilidad climática y producción agrícola
 
-<!-- # Marco Teórico -->
+Las relaciones no lineales entre la temperatura, la precipitación y la productividad agrícola son fundamentales para identificar umbrales críticos y desarrollar estrategias adaptativas frente a los efectos del cambio climático. La variabilidad climática, que incluye cambios en la temperatura y patrones de precipitación, afecta de manera compleja la productividad agrícola. Estudios han demostrado que el aumento de la temperatura puede tener efectos adversos en el rendimiento de cultivos como el arroz, donde se ha observado que los umbrales críticos de temperatura pueden determinar la viabilidad de la producción (Atedhor, 2019; Ojo \& Baiyegunhi, 2020). Además, la interacción entre la temperatura y la precipitación puede crear condiciones que exacerban la sequía o el exceso de humedad, afectando negativamente el crecimiento de los cultivos (Panda et al., 2019; Huang et al., 2020).
 
+La identificación de estos umbrales críticos es esencial para la planificación agrícola y la implementación de estrategias adaptativas. En regiones donde la temperatura excede ciertos niveles, los cultivos pueden experimentar una disminución en la calidad y cantidad de producción, lo que resalta la necesidad de ajustar las prácticas agrícolas, como el cambio en los tiempos de siembra o la selección de variedades de cultivos más resistentes (Singh et al., 2022; Siddiqui et al., 2022). La investigación también sugiere que la adopción de estrategias de adaptación, como el uso de tecnologías de riego y la implementación de prácticas de agricultura inteligente frente al clima, puede mitigar los efectos negativos del cambio climático y mejorar la resiliencia de los sistemas agrícolas (Ahmed et al., 2019; Sadiku et al., 2017).
 
+Además, la comprensión de las relaciones no lineales entre estos factores climáticos permite a los agricultores y a los responsables de políticas anticipar y responder a los cambios en la productividad agrícola. Se ha encontrado que la productividad de cultivos como la caña de azúcar presenta relaciones no lineales con las temperaturas, lo que implica que pequeñas variaciones en las condiciones climáticas pueden tener efectos desproporcionados en el rendimiento (Kumar, 2014). Esto subraya la importancia de monitorear y modelar estas relaciones para desarrollar políticas agrícolas efectivas que se adapten a las condiciones climáticas cambiantes.
 
+## Modelos lineales generalizados
 
+Los Modelos Lineales Generalizados (GLM) presentan ventajas significativas sobre los modelos lineales clásicos, especialmente en contextos donde los datos no siguen una distribución normal. Una de las principales ventajas de los GLM es su capacidad para manejar diferentes tipos de distribuciones de respuesta, lo que permite modelar datos que son binarios, de conteo o que presentan heterocedasticidad, entre otros (Vélez \& Correa, 2013; Canales \& Arana, 2012). Esto es crucial en muchas aplicaciones prácticas, como en epidemiología, donde se ha observado que los GLM pueden ajustarse mejor a los datos de mortalidad y otros fenómenos que no se distribuyen normalmente (Bonilla-Carrión et al., 2023).
 
+Los modelos estadísticos, como los GLM utilizados en este proyecto, son herramientas clave para analizar datos con distribuciones no normales. En este caso, la distribución Gamma es ideal para modelar variables con asimetría positiva, como la productividad agrícola. La selección de funciones de enlace logarítmico e inverso permite explorar diferentes relaciones entre predictores y la variable objetivo. Métricas como el AIC (Criterio de Información de Akaike) y el BIC (Criterio de Información Bayesiano) son fundamentales para evaluar la eficiencia de los modelos, penalizando aquellos con mayor complejidad.
 
+## Análisis de residuos y validación de ajuste
 
+Los residuos, y en particular el residuo de Pearson, son herramientas cruciales para evaluar la validez de los supuestos estadísticos y la calidad del ajuste en los Modelos Lineales Generalizados (GLM). Los residuos de Pearson se calculan como la diferencia entre los valores observados y los valores predichos, normalizados por la desviación estándar de los valores predichos. Este enfoque permite identificar patrones en los residuos que pueden indicar problemas en el modelo, como la falta de ajuste, la heterocedasticidad o la especificación incorrecta de la distribución de la variable dependiente (Botero \& Barajas, 2017).
 
+Un análisis de los residuos de Pearson puede revelar si los supuestos de independencia, homocedasticidad y normalidad de los errores se cumplen. Por ejemplo, si los residuos muestran una tendencia sistemática o patrones no aleatorios, esto sugiere que el modelo no está capturando adecuadamente la relación entre las variables, lo que podría llevar a inferencias erróneas (Botero \& Barajas, 2017). La identificación de tales patrones permite a los investigadores ajustar el modelo, ya sea mediante la inclusión de términos adicionales, la transformación de variables o el uso de un modelo diferente que se ajuste mejor a la naturaleza de los datos (Corrales, 2020; Díaz-Quijano, 2016).
+
+La mejora en la calidad del ajuste a través del análisis de residuos también tiene un impacto directo en el desempeño predictivo del modelo. Un modelo que se ajusta bien a los datos históricos es más probable que realice predicciones precisas en nuevos datos. Por ejemplo, en estudios de modelación predictiva, se ha demostrado que los modelos que consideran adecuadamente los residuos y ajustan sus especificaciones en consecuencia pueden mejorar significativamente la precisión de las proyecciones (Corrales, 2020). Esto es especialmente relevante en contextos como la predicción de siniestros en seguros o la estimación de la productividad agrícola, donde la precisión de las predicciones puede tener implicaciones económicas significativas (Corrales, 2020).
+
+Además, la eliminación de valores atípicos y el análisis de multicolinealidad son esenciales para garantizar la estabilidad y validez de los modelos. Herramientas como la correlación de Pearson, el coeficiente Eta Squared y Cramér’s V permiten identificar relaciones significativas entre variables numéricas y categóricas, proporcionando un marco robusto para interpretar la interacción entre el clima y la productividad agrícola. Este enfoque estadístico ayuda a traducir datos complejos en estrategias concretas para mitigar los impactos del cambio climático en la agricultura.
 
 
 
@@ -1405,7 +1427,100 @@ summary(glm_inverse_red_clean)
 
 
 
-<!-- # Interpretación de Resultados -->
+# Interpretación de Resultados
+
+## Datos Faltantes
+
+No se encontraron datos faltantes en el dataset, lo que refuerza la confiabilidad de los análisis realizados. Esto elimina la necesidad de realizar imputaciones, preservando la integridad de las relaciones entre variables.
+
+## Variables Numéricas
+
+### Productividad Agrícola
+La distribución muestra asimetría positiva, con la mayoría de los cultivos presentando rendimientos bajos (alrededor de 1-2 toneladas por hectárea) y un número reducido con rendimientos altos (hasta 5 toneladas por hectárea). Esto sugiere que la productividad agrícola sigue una tendencia donde los factores climáticos y de manejo tienen un impacto considerable, aunque solo algunos sistemas agrícolas logran maximizar el rendimiento.
+
+### Temperatura Promedio
+La distribución bimodal indica que el dataset incluye regiones con climas predominantemente fríos y cálidos, con picos en temperaturas promedio de 10°C y 25°C. Esto podría reflejar zonas templadas y tropicales, respectivamente. Los valores extremos sugieren regiones con condiciones climáticas inusuales, lo que podría afectar significativamente el rendimiento.
+
+### Precipitación Total
+Aunque la mayoría de las regiones reciben precipitaciones moderadas (500-1000 mm), algunas áreas muestran lluvias excepcionalmente altas (>2500 mm), asociadas probablemente con zonas tropicales o eventos extremos como inundaciones.
+
+### Eventos Climáticos Extremos
+El bajo número de eventos extremos en la mayoría de las observaciones (0-5) indica que no todas las regiones enfrentan riesgos climáticos severos. Sin embargo, las pocas regiones con más de 5 eventos anuales destacan como áreas de alta vulnerabilidad climática.
+
+### Uso de Pesticidas y Fertilizantes
+El uso moderado de pesticidas y fertilizantes en la mayoría de las regiones indica una agricultura menos intensiva químicamente, pero los valores más altos sugieren prácticas intensivas en cultivos específicos o regiones con problemas de plagas y suelos menos fértiles.
+
+### Índice de Salud del Suelo
+El índice centrado en valores altos (70-80) refleja una buena calidad general del suelo en el dataset. Sin embargo, las regiones con valores más bajos podrían requerir estrategias específicas de manejo del suelo para mejorar la productividad.
+
+## Variables Categóricas
+
+### Países y Regiones
+La representatividad equilibrada entre países y regiones asegura que los resultados sean aplicables globalmente. Sin embargo, regiones como el sur de Asia y Europa parecen estar más representadas, lo que podría sesgar algunas observaciones.
+
+### Tipos de Cultivo
+La distribución homogénea entre cultivos principales (trigo, arroz, maíz) sugiere que los resultados son relevantes para los cultivos clave en la seguridad alimentaria mundial. Los cultivos menos representados, como el café, podrían requerir análisis específicos.
+
+### Estrategias de Adaptación
+La preferencia por la gestión de agua y la rotación de cultivos como estrategias de adaptación destaca la importancia del manejo eficiente de recursos frente a riesgos climáticos.
+
+## Relaciones entre Variables (Gráficos de Pares y Matriz de Correlación)
+
+Los gráficos de dispersión revelaron correlaciones positivas entre la temperatura promedio y la productividad agrícola, hasta cierto umbral (~25°C), más allá del cual la productividad disminuye, indicando un efecto negativo de climas excesivamente cálidos. La precipitación también mostró una relación no lineal, con precipitaciones muy bajas o excesivas reduciendo el rendimiento.
+
+La matriz de correlación indicó relaciones moderadas, sin multicolinealidad significativa entre las variables predictoras, lo que asegura la estabilidad de los modelos ajustados.
+
+## Modelos Generales y Reducidos
+
+Se ajustaron cuatro modelos GLM, dos completos y dos reducidos, utilizando funciones de enlace logarítmico e inverso. El modelo reducido con enlace logarítmico mostró el mejor desempeño según AIC (26824.27) y BIC (26925.10), lo que indica que logra un equilibrio óptimo entre precisión y simplicidad. Este modelo resalta que los factores más significativos para predecir la productividad agrícola son la temperatura promedio, la precipitación total y el tipo de cultivo.
+
+## Bondad de Ajuste y Residuos
+
+Los residuos de Pearson y Deviance confirmaron que los supuestos del modelo (distribución Gamma y enlace logarítmico) son apropiados. Aunque se identificaron patrones residuales no explicados completamente, estos representan una pequeña fracción del conjunto de datos y no comprometen las conclusiones. Estos patrones no explicados pueden derivarse de un llenado (llenar con media ponderada) de la base de datos.
+
+## Eliminación de Outliers
+
+La detección de 80 valores atípicos (0.8\% del dataset) mediante leverage y distancia de Cook permitió ajustar los modelos sin influencias desproporcionadas. Esto mejoró la precisión de las inferencias.
+
+## Comparación y Selección de Modelos
+
+El análisis comparativo mostró que el modelo reducido con enlace logarítmico es el más adecuado para explicar y predecir la productividad agrícola. Aunque el modelo completo ofrece una ligera mejora en el pseudo $R^2$ (0.0798 frente a 0.0788), esta diferencia es marginal y no justifica su mayor complejidad.
 
 
-<!-- # Conclusiones -->
+
+
+
+# Conclusiones
+
+Este análisis demuestra que la productividad agrícola está influenciada significativamente por factores climáticos y ambientales, siendo la temperatura promedio, la precipitación total y el tipo de cultivo los predictores más relevantes. El modelo reducido con enlace logarítmico ofrece la mejor combinación de precisión predictiva y simplicidad, destacándose como una herramienta eficiente para modelar la relación entre condiciones ambientales y rendimiento agrícola.
+
+Los hallazgos tienen implicaciones prácticas para la toma de decisiones en políticas agrícolas y manejo sostenible. Estrategias como la optimización del riego y la implementación de cultivos resistentes al clima podrían ser fundamentales para mitigar los efectos adversos del cambio climático.
+
+Sin embargo, las limitaciones incluyen la falta de exploración de interacciones complejas entre factores y posibles sesgos geográficos en los datos. Estudios futuros podrían incorporar modelos no lineales más sofisticados o análisis regionales detallados para comprender mejor las dinámicas locales.
+
+En resumen, este proyecto valida el uso de modelos estadísticos para identificar y cuantificar los efectos del clima en la productividad agrícola, ofreciendo \textit{insights} valiosos para un futuro más resiliente en la seguridad alimentaria.
+
+
+
+# Referencias
+
+\begin{enumerate}
+    \item Vélez and Correa. "Comparación de procedimientos FDR para la selección de parámetros en Regresión Poisson." \textit{Comunicaciones en estadística} (2013). doi:10.15332/s2027-3355.2013.0001.03.
+    \item Canales and Arana. "Estimación de la biomasa de langostino amarillo (\textit{Cervimunida johni}), aplicando Modelo Lineal Generalizado a registros de captura por área barrida en la zona central de Chile." \textit{Latin American Journal of Aquatic Research} (2012). doi:10.3856/vol40-issue2-fulltext-7.
+    \item Castillo-Badilla. "Factores del animal y el manejo predestete que afectan la edad al primer parto en hatos de lechería especializada de Costa Rica." \textit{Agronomía costarricense} (2019). doi:10.15517/rac.v43i2.37788.
+    \item Oddi. "Cuando la variabilidad varía: Heterocedasticidad y funciones de varianza." \textit{Ecología austral} (2020). doi:10.25260/ea.20.30.3.0.1131.
+    \item Torrejón-Magallanes et al. "Estimación del descarte por exceso de captura en la pesquería industrial de cerco del stock Norte-Centro de la anchoveta peruana \textit{Engraulis ringens} a partir de un programa de observación a bordo." \textit{Revista peruana de biología} (2016). doi:10.15381/rpb.v23i2.12435.
+    \item Atedhor. "Rainfall variability and drought during the sowing season and mid-season of rice in the Sudano-Sahelian Region of Nigeria." \textit{Journal of the Cameroon Academy of Sciences} (2019). doi:10.4314/jcas.v15i1.4.
+    \item Ojo \& Baiyegunhi. "Determinants of credit constraints and its impact on the adoption of climate change adaptation strategies among rice farmers in South-West Nigeria." \textit{Journal of Economic Structures} (2020). doi:10.1186/s40008-020-00204-6.
+    \item Panda et al. "Impact of Climate Variability on Crop Yield in Kalahandi, Bolangir, and Koraput Districts of Odisha, India." \textit{Climate} (2019). doi:10.3390/cli7110126.
+    \item Huang et al. "Vulnerability Assessment and Adaptation Strategies for the Impact of Climate Change on Agricultural Land in Southern Taiwan." \textit{Sustainability} (2020). doi:10.3390/su12114637.
+    \item Singh et al. "Implications of Farmer's Adaptation Strategies to Climate Change in Agricultural Sector of Gujarat: Experience from Farm Level Data." \textit{Research on World Agricultural Economy} (2022). doi:10.36956/rwae.v3i1.498.
+    \item Siddiqui et al. "The Impact of Climate Change on Major Agricultural Crops: Evidence from Punjab, Pakistan." \textit{The Pakistan Development Review} (2022). doi:10.30541/v51i4iipp.261-276.
+    \item Ahmed et al. "Climate Change Impacts and Adaptation Strategies for Agronomic Crops." (2019). doi:10.5772/intechopen.82697.
+    \item Sadiku et al. "Climate-Smart Agriculture." \textit{International Journal of Advanced Research in Computer Science and Software Engineering} (2017). doi:10.23956/ijarcsse/v7i2/01202.
+    \item Kumar. "Climate Change and Sugarcane Productivity in India: An Econometric Analysis." \textit{Journal of Social and Development Sciences} (2014). doi:10.22610/jsds.v5i2.811.
+    \item Corrales. "Modelación predictiva de siniestros en seguros de no vida." \textit{Revista de matemática teoría y aplicaciones} (2020). doi:10.15517/rmta.v28i1.39030.
+    \item Botero \& Barajas. "El impacto de especificar incorrectamente la distribución de los efectos aleatorios en las estimaciones de modelos lineales generalizados mixtos." \textit{Comunicaciones en estadística} (2017). doi:10.15332/2422474x.3267.
+    \item Cruz. "Evaluación de la política de extensionismo rural en México, con base en modelos econométricos lineales y no lineales." \textit{Agricultura sociedad y desarrollo} (2024). doi:10.22231/asyd.v21i3.1621.
+\end{enumerate}
+
